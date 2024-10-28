@@ -1,0 +1,853 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/amazon-ecommerce#"
+     xml:base="http://www.semanticweb.org/amazon-ecommerce"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/amazon-ecommerce"/>
+    
+    <!-- Classes -->
+    <owl:Class rdf:about="#Amazon"/>
+    
+    <owl:Class rdf:about="#GiftCard">
+        <rdfs:subClassOf rdf:resource="#Amazon"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#All_Beauty">
+        <rdfs:subClassOf rdf:resource="#Amazon"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Amazon_Fashion">
+        <rdfs:subClassOf rdf:resource="#Amazon"/>
+    </owl:Class>
+
+
+<owl:Class rdf:about="#Appliances">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Arts_Crafts_and_Sewing">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Automotive">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Baby_Products">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Beauty_and_Personal_Care">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Books">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#CDs_and_Vinyl">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Cell_Phones_and_Accessories">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Clothing_Shoes_and_Jewelry">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Digital_Music">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Electronics">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Grocery_and_Gourmet_Food">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Handmade_Products">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Health_and_Household">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Health_and_Personal_Care">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Home_and_Kitchen">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Industrial_and_Scientific">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Kindle_Store">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Magazine_Subscriptions">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Movies_and_TV">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Musical_Instruments">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Office_Products">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Patio_Lawn_and_Garden">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Pet_Supplies">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Software">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Sports_and_Outdoors">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Subscription_Boxes">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Tools_and_Home_Improvement">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Toys_and_Games">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Video_Games">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Unknown">
+    <rdfs:subClassOf rdf:resource="#Amazon"/>
+</owl:Class>
+
+    
+   
+
+    <!-- Common subclasses for GiftCard, All_Beauty, and Amazon_Fashion -->
+    <owl:Class rdf:about="#MainCategory">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Title">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#AverageRating">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#RatingNumber">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Features">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Description">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Price">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Images">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Videos">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Store">
+       <rdfs:subClassOf rdf:resource="#GiftCard"/>
+       <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+       <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Categories">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Details">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#ParentASIN">
+        <rdfs:subClassOf rdf:resource="#GiftCard"/>
+        <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+        <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <owl:Class rdf:about="#BoughtTogether">
+       <rdfs:subClassOf rdf:resource="#GiftCard"/>
+       <rdfs:subClassOf rdf:resource="#All_Beauty"/>
+       <rdfs:subClassOf rdf:resource="#Amazon_Fashion"/>
+<rdfs:subClassOf rdf:resource="#Appliances"/>
+<rdfs:subClassOf rdf:resource="#Arts_Crafts_and_Sewing"/>
+<rdfs:subClassOf rdf:resource="#Automotive"/>
+<rdfs:subClassOf rdf:resource="#Baby_Products"/>
+<rdfs:subClassOf rdf:resource="#Beauty_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Books"/>
+<rdfs:subClassOf rdf:resource="#CDs_and_Vinyl"/>
+<rdfs:subClassOf rdf:resource="#Cell_Phones_and_Accessories"/>
+<rdfs:subClassOf rdf:resource="#Clothing_Shoes_and_Jewelry"/>
+<rdfs:subClassOf rdf:resource="#Digital_Music"/>
+<rdfs:subClassOf rdf:resource="#Electronics"/>
+<rdfs:subClassOf rdf:resource="#Grocery_and_Gourmet_Food"/>
+<rdfs:subClassOf rdf:resource="#Handmade_Products"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Household"/>
+<rdfs:subClassOf rdf:resource="#Health_and_Personal_Care"/>
+<rdfs:subClassOf rdf:resource="#Home_and_Kitchen"/>
+<rdfs:subClassOf rdf:resource="#Industrial_and_Scientific"/>
+<rdfs:subClassOf rdf:resource="#Kindle_Store"/>
+<rdfs:subClassOf rdf:resource="#Magazine_Subscriptions"/>
+<rdfs:subClassOf rdf:resource="#Movies_and_TV"/>
+<rdfs:subClassOf rdf:resource="#Musical_Instruments"/>
+<rdfs:subClassOf rdf:resource="#Office_Products"/>
+<rdfs:subClassOf rdf:resource="#Patio_Lawn_and_Garden"/>
+<rdfs:subClassOf rdf:resource="#Pet_Supplies"/>
+<rdfs:subClassOf rdf:resource="#Software"/>
+<rdfs:subClassOf rdf:resource="#Sports_and_Outdoors"/>
+<rdfs:subClassOf rdf:resource="#Subscription_Boxes"/>
+<rdfs:subClassOf rdf:resource="#Tools_and_Home_Improvement"/>
+<rdfs:subClassOf rdf:resource="#Toys_and_Games"/>
+<rdfs:subClassOf rdf:resource="#Video_Games"/>
+<rdfs:subClassOf rdf:resource="#Unknown"/>
+
+    </owl:Class>
+    
+    <!-- Subclasses of Images -->
+    <owl:Class rdf:about="#Thumb">
+        <rdfs:subClassOf rdf:resource="#Images"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Large">
+        <rdfs:subClassOf rdf:resource="#Images"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Variant">
+        <rdfs:subClassOf rdf:resource="#Images"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#HiRes">
+        <rdfs:subClassOf rdf:resource="#Images"/>
+    </owl:Class>
+    
+    <!-- Subclasses of Details -->
+    <owl:Class rdf:about="#PackageDimensions">
+        <rdfs:subClassOf rdf:resource="#Details"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#ItemModelNumber">
+        <rdfs:subClassOf rdf:resource="#Details"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#DateFirstAvailable">
+        <rdfs:subClassOf rdf:resource="#Details"/>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#Manufacturer">
+        <rdfs:subClassOf rdf:resource="#Details"/>
+    </owl:Class>
+    
+    <!-- Individuals -->
+    <owl:NamedIndividual rdf:about="#GiftCard1">
+        <rdf:type rdf:resource="#GiftCard"/>
+        <hasMainCategory>Gift Cards</hasMainCategory>
+        <hasTitle>Amazon.com Gift Card in Gift Tag (Various Designs)</hasTitle>
+        <hasAverageRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">4.8</hasAverageRating>
+        <hasRatingNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1006</hasRatingNumber>
+        <hasStore>Amazon</hasStore>
+        <hasParentASIN>B06ZXTKYHN</hasParentASIN>
+    </owl:NamedIndividual>
+    
+    <owl:NamedIndividual rdf:about="#GiftCard2">
+        <rdf:type rdf:resource="#GiftCard"/>
+        <hasMainCategory>Gift Cards</hasMainCategory>
+        <hasTitle>$25 Mastercard Gift Card (plus $3.95 Purchase Fee)</hasTitle>
+        <hasAverageRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">2.5</hasAverageRating>
+        <hasRatingNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11</hasRatingNumber>
+        <hasStore>Mastercard</hasStore>
+        <hasParentASIN>B07FX2LXR4</hasParentASIN>
+    </owl:NamedIndividual>
+    
+    <owl:NamedIndividual rdf:about="#GiftCard3">
+        <rdf:type rdf:resource="#GiftCard"/>
+        <hasMainCategory>Gift Cards</hasMainCategory>
+        <hasTitle>Tractor Supply Company Gift Card</hasTitle>
+        <hasAverageRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">4.9</hasAverageRating>
+        <hasRatingNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2708</hasRatingNumber>
+        <hasPrice rdf:datatype="http://www.w3.org/2001/XMLSchema#float">50.0</hasPrice>
+        <hasStore>Tractor Supply Company</hasStore>
+        <hasParentASIN>B01GKWEISG</hasParentASIN>
+    </owl:NamedIndividual>
+    
+    <!-- Object Properties -->
+    <owl:ObjectProperty rdf:about="#hasMainCategory">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#MainCategory"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasTitle">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Title"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasAverageRating">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#AverageRating"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasRatingNumber">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#RatingNumber"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasFeatures">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Features"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasDescription">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Description"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasPrice">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Price"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasImages">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Images"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasVideos">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Videos"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasStore">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Store"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasCategories">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Categories"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasDetails">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#Details"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasParentASIN">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#ParentASIN"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#hasBoughtTogether">
+        <rdfs:domain rdf:resource="#GiftCard"/>
+        <rdfs:domain rdf:resource="#All_Beauty"/>
+        <rdfs:domain rdf:resource="#Amazon_Fashion"/>
+        <rdfs:range rdf:resource="#BoughtTogether"/>
+    </owl:ObjectProperty>
+
+</rdf:RDF>
