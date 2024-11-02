@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Knowledge Graph Visualization</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        #sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            overflow-y: auto;
+        }
+        #graph {
+            flex-grow: 1;
+            height: 100vh;
+            border-left: 1px solid lightgray;
+            border-right: 1px solid lightgray;
+        }
+        #details-sidebar {
+            width: 300px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            overflow-y: auto;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        .filter-section h3 {
+            margin-top: 0;
+        }
+        .checkbox-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .checkbox-item {
+            margin: 5px 0;
+        }
+        #apply-filters {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #apply-filters:hover {
+            background-color: #45a049;
+        }
+        .property-row {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .property-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .property-value {
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Filters</h2>
+        <div class="filter-section">
+            <h3>Main Categories</h3>
+            <div class="checkbox-list">
+                {% for category in main_categories %}
+                <div class="checkbox-item">
+                    <input type="checkbox" name="mainCategory" value="{{ category }}" id="main-{{ category }}">
+                    <label for="main-{{ category }}">
+                        {{ category }} ({{ main_cat_counts.get(category, 0) }})
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="filter-section">
+            <h3>Categories</h3>
+            <div class="checkbox-list">
+                {% for category in categories %}
+                <div class="checkbox-item">
+                    <input type="checkbox" name="category" value="{{ category }}" id="cat-{{ category }}">
+                    <label for="cat-{{ category }}">
+                        {{ category }} ({{ cat_counts.get(category, 0) }})
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button id="apply-filters">Apply Filters</button>
+    </div>
+    <div id="graph"></div>
+    <div id="details-sidebar">
+        <div id="node-details" style="display: none;">
+            <h3 id="details-title"></h3>
+            <div id="details-properties"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        let network = null;
+
+        function loadGraph() {
+            // Get selected filters
+            const mainCategories = Array.from(document.querySelectorAll('input[name="mainCategory"]:checked'))
+                .map(cb => cb.value);
+            const categories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+                .map(cb => cb.value);
+            
+            // Build query string
+            const params = new URLSearchParams();
+            mainCategories.forEach(cat => params.append('mainCategory', cat));
+            categories.forEach(cat => params.append('category', cat));
+            
+            fetch('/graph-data?' + params.toString())
+                .then(response => response.json())
+                .then(data => {
+                    const nodes = new vis.DataSet(
+                        data.nodes.map(node => ({
+                            id: node.id,
+                            label: node.label,
+                            group: node.label,
+                            properties: node.properties
+                        }))
+                    );
+
+                    const edges = new vis.DataSet(
+                        data.edges.map(edge => ({
+                            from: edge.from,
+                            to: edge.to,
+                            label: edge.type
+                        }))
+                    );
+
+                    const container = document.getElementById('graph');
+                    const options = {
+                        nodes: {
+                            shape: 'dot',
+                            size: 16,
+                            color: {
+                                border: '#2B7CE9',
+                                background: '#97C2FC',
+                                highlight: {
+                                    border: '#2B7CE9',
+                                    background: '#D2E5FF'
+                                }
+                            }
+                        },
+                        physics: {
+                            stabilization: false,
+                            barnesHut: {
+                                gravitationalConstant: -80000,
+                                springConstant: 0.001,
+                                springLength: 200
+                            }
+                        }
+                    };
+
+                    if (network) {
+                        network.destroy();
+                    }
+                    network = new vis.Network(container, { nodes, edges }, options);
+
+                    network.on("click", function(params) {
+                        if (params.nodes.length > 0) {
+                            const nodeId = params.nodes[0];
+                            const node = nodes.get(nodeId);
+                            showNodeDetails(node);
+                        } else {
+                            hideNodeDetails();
+                        }
+                    });
+                });
+        }
+
+        document.getElementById('apply-filters').addEventListener('click', loadGraph);
+        
+        // Initial load
+        loadGraph();
+
+        function showNodeDetails(node) {
+            const detailsContainer = document.getElementById('node-details');
+            const title = document.getElementById('details-title');
+            const properties = document.getElementById('details-properties');
+            
+            // Show the details container
+            detailsContainer.style.display = 'block';
+            
+            // Set title
+            title.textContent = `${node.label}`;
+            
+            // Clear previous properties
+            properties.innerHTML = '';
+            
+            // Add all properties
+            Object.entries(node.properties).forEach(([key, value]) => {
+                const propertyDiv = document.createElement('div');
+                propertyDiv.className = 'property-row';
+                propertyDiv.innerHTML = `
+                    <div class="property-label">${key}</div>
+                    <div class="property-value">${value}</div>
+                `;
+                properties.appendChild(propertyDiv);
+            });
+        }
+
+        function hideNodeDetails() {
+            const detailsContainer = document.getElementById('node-details');
+            detailsContainer.style.display = 'none';
+        }
+    </script>
+</body>
+</html> 

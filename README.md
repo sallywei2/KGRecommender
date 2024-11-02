@@ -17,6 +17,8 @@ Edit the following in utils/rag_constants.py to your own values:
 	
 	PROJECT_ID
 
+[Install the Google Cloud command line interface](https://cloud.google.com/sdk/docs/install-sdk) (gcloud CLI).
+
 ### Google Cloud Storage
 
 To set up the preprocessing pipeline:
@@ -89,6 +91,10 @@ Download the code and unzip it.
 	pip install apache_beam[gcp]
 	pip install google-apitools
 
+	# visualization
+	pip install flask
+	pip install vis-network
+
 ### Neo4J Desktop
 
 You can connect to a local Neo4J Desktop instance instead of one hosted on GCP.
@@ -107,8 +113,6 @@ Edit the following in utils/rag_constants.py to your own values. Below are the d
 Start Neo4j Desktop
 Start the database engine.
 
-Set the NEO4J_USER and NEO4J_PASSWORD in utils/rag_constants.py to your own Neo4J credentials.
-
 In a console, navigate to the top level of the code and run
 
 	jupyter notebook
@@ -116,3 +120,9 @@ In a console, navigate to the top level of the code and run
 In Jupyter Notebook, open sample.ipynb
 
 Run the cells to load the knowledge graph into your local neo4J database.
+
+## Run Frontend Locally
+
+Run in a console:
+	python flask_graph_visualization.py
+Then visit http://localhost:5000 to access the frontend.
