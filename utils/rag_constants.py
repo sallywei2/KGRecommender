@@ -36,3 +36,17 @@ NEO4J_URI = "neo4j+s://508011ec.databases.neo4j.io"
 NEO4J_USERNAME = "neo4j"
 NEO4J_PASSWORD = "WVdTBF4CkcyCgzVTrUoCQsXQCSLi0qBLjp_st-EClTw"
 """
+
+### Mouni
+"""
+# Google Cloud Project
+PROJECT_ID = "project298bmoni"
+
+# Google Cloud Storage
+REGION = 'us-west2'
+BUCKET = 'ontology-project'
+
+# BigQuery
+DATASET_ID = "JSON_DATASET"
+TABLE_ID = "clean_giftcard"
+"""
