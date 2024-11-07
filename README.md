@@ -1,11 +1,33 @@
 # KGRecommender
-We'll change the name later
 
 # Installation and Deployment
 
 Click the green "<> Code" button, then Open with Github Desktop.
 
 Github Desktop will prompt you for a location to download the code repository to. Continue with your selection to add the folder /KGRecommender to your selected file location.
+
+### Install Python Dependencies
+
+	# neo4j, graph data science
+	pip install neo4j
+	pip install py2neo
+	pip install rdflib
+	pip install networkx[default]
+
+	# google cloud
+	pip install google-cloud
+	pip install google-cloud-bigquery
+	pip install google-cloud-storage
+	pip install google-cloud-aiplatform
+
+	# preprocessing pipeline and GCP
+	pip install apache_beam
+	pip install apache_beam[gcp]
+	pip install google-apitools
+
+	# visualization
+	pip install flask
+	pip install vis-network
 
 ## CLoud Setup
 
@@ -19,7 +41,15 @@ Edit the following in utils/rag_constants.py to your own values:
 
 [Install the Google Cloud command line interface](https://cloud.google.com/sdk/docs/install-sdk) (gcloud CLI).
 
-### Google Cloud Storage
+Generate authentication for gcloud
+
+	gcloud auth application-default login
+
+(Optional) To ensure `gcloud` is updated, run:
+
+	gcloud components update
+
+### GCP Cloud Storage
 
 To set up the preprocessing pipeline:
 
@@ -32,7 +62,7 @@ Edit the following in utils/rag_constants.py to your own values:
 	REGION
 	BUCKET
 
-### Google BigQuery
+### GCP BigQuery
 
 You can also upload `sample_data/giftcard.csv` data to BigQuery instead of using the local copy included in this repository.
 
@@ -41,7 +71,7 @@ Edit the following in utils/rag_constants.py to your own values:
 	DATASET_ID
 	TABLE_ID
 
-#### Dataflow API
+### GCP Dataflow API
 
 In GCP Console, search for DataFlow API (*not* Dataflow). Enable it.
 
@@ -56,8 +86,7 @@ Edit the following in utils/rag_constants.py to your own values:
 
 	os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:/Users/.../deft-return-439619-h9-151ce547a5fd.json"
 
-
-### Neo4j Aura
+### GCP Neo4j Aura Integration Service & Neo4J Aura
 
 From the GCP console, search for Neo4j Aura and subscribe to it. Then Enable it.
 
@@ -69,31 +98,11 @@ Edit the following in utils/rag_constants.py to your own values:
 	NEO4J_USERNAME
 	NEO4J_PASSWORD
 
+### GCP Vertex AI
+
+Enable Vertex AI in the GCP Console for your project.
+
 ## Local Setup
-
-Download the code and unzip it.
-
-### Install Python Dependencies
-
-	# neo4j, graph data science
-	pip install neo4j
-	pip install py2neo
-	pip install rdflib
-	pip install networkx[default]
-
-	# google cloud
-	pip install google-cloud
-	pip install google-cloud-bigquery
-	pip install google-cloud-storage
-
-	# preprocessing pipeline and GCP
-	pip install apache_beam
-	pip install apache_beam[gcp]
-	pip install google-apitools
-
-	# visualization
-	pip install flask
-	pip install vis-network
 
 ### Neo4J Desktop
 
@@ -110,10 +119,10 @@ Edit the following in utils/rag_constants.py to your own values. Below are the d
 
 ## Run Locally On Sample Data
 
-Start Neo4j Desktop
-Start the database engine.
+Start Neo4j Desktop.
+Start the default Neo4j database.
 
-In a console, navigate to the top level of the code and run
+In a console, navigate to the KGRecommender folder and run
 
 	jupyter notebook
 
@@ -124,5 +133,5 @@ Run the cells to load the knowledge graph into your local neo4J database.
 ## Run Frontend Locally
 
 Run in a console:
-	python flask_graph_visualization.py
-Then visit http://localhost:5000 to access the frontend.
+	python app/main.py
+Then visit http://localhost:5000 in a web browserto access the frontend.

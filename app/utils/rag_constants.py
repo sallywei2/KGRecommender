@@ -39,6 +39,9 @@ NEO4J_PASSWORD = "WVdTBF4CkcyCgzVTrUoCQsXQCSLi0qBLjp_st-EClTw"
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USERNAME = "neo4j"
 NEO4J_PASSWORD = "password"
+
+# Vertex AI
+GENERATIVE_MODEL = "gemini-1.5-flash-002"
 """
 
 ### Mouni
