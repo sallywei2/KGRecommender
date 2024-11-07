@@ -2,7 +2,7 @@
 Author: Nandini
 """
 
-from utils.rag_constants import * 
+from . import rag_constants
 
 from google.cloud import bigquery
 

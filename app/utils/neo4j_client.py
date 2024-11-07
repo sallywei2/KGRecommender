@@ -1,8 +1,8 @@
 """
 Authors: Nandini, Sally
 """
-from utils import bigquery_client, print_debug
-from utils.rag_constants import *
+from . import print_debug, bigquery_client
+from .rag_constants import *
 
 from neo4j import GraphDatabase, Result
 import pandas as pd
@@ -10,9 +10,11 @@ from rdflib import Graph as RDFGraph, Namespace, RDF, RDFS, OWL
 from py2neo import Graph as Neo4jGraph, Node, Relationship
 import os
 
+driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+
 def get_driver():
     print(f"Connected to Neo4J instance at {NEO4J_URI}")
-    return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+    return driver
 
 def exec_query(driver, q, parameters=None, db="neo4j"):
     """
@@ -230,7 +232,7 @@ class KnowledgeGraphLoader():
     
             # Filter attributes, making sure none of them are None
             attributes = {k: v for k, v in row.to_dict().items() if isinstance(v, (int, float, str)) and pd.notna(v)}
-            main_node = Node(title, **attributes)
+            main_node = Node("Product", title, **attributes)
     
             for attr in attributes:
                 if attr == 'mainCategory':

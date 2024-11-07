@@ -1,4 +1,11 @@
 import os
+from enum import Enum
+
+class Mode(Enum):
+    Graph: str = "graph"
+    Vector: str = "vector"
+
+MODEL_MODE = Mode.Graph #default mode
 
 ### Nandini
 """
@@ -42,6 +49,7 @@ NEO4J_PASSWORD = "password"
 
 # Vertex AI
 GENERATIVE_MODEL = "gemini-1.5-flash-002"
+MODEL_REGION = "us-central1"
 """
 
 ### Mouni
