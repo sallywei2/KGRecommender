@@ -1,13 +1,16 @@
-from flask import Flask, render_template, jsonify, request
-from neo4j import GraphDatabase
+from flask import Blueprint,Flask, render_template, jsonify, request
 from utils.rag_constants import NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD
+from utils.neo4j_client import get_driver, exec_query
 
-app = Flask(__name__)
+# Create blueprint
+graph = Blueprint('graph', __name__, 
+                 template_folder='templates',
+                 static_folder='static',
+                 url_prefix='/graph')
 
 try:
-    # Neo4j driver initialization
-    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
     # Test the connection
+    driver = get_driver()
     driver.verify_connectivity()
 except Exception as e:
     print(f"Failed to connect to Neo4j: {str(e)}. Please check if the Neo4j server is on and that the connection credentials are correctly set in utils/rag_constants.py")
@@ -118,8 +121,10 @@ def get_filtered_graph_data(main_categories=None, categories=None):
         print(f"Error querying Neo4j: {str(e)}")
         return [], []
 
-@app.route('/')
-def index():
+
+# Change route to blueprint route
+@graph.route('/')
+def visualization():
     main_categories, categories, main_cat_counts, cat_counts = get_categories()
     return render_template('graph.html', 
                          main_categories=main_categories,
@@ -127,7 +132,7 @@ def index():
                          main_cat_counts=main_cat_counts,
                          cat_counts=cat_counts)
 
-@app.route('/graph-data')
+@graph.route('/graph-data')
 def get_graph():
     main_cats = request.args.getlist('mainCategory')
     cats = request.args.getlist('category')
@@ -138,5 +143,39 @@ def get_graph():
     )
     return jsonify({"nodes": nodes, "edges": relationships})
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+@graph.route('/update-category-counts')
+def update_category_counts():
+    selected_main_categories = request.args.getlist('mainCategory')
+    
+    # if no categories are selected, return empty result to maintain existing counts
+    if not selected_main_categories:
+        return jsonify({'category_counts': {}})
+        
+    driver = get_driver()
+    query = """
+    MATCH (n)-[]->(m)
+    WHERE n.mainCategory IN $main_categories
+    AND n.categories IS NOT NULL
+    UNWIND split(n.categories, ',') as category
+    WITH trim(category) as temp_category, m
+    WITH CASE 
+        WHEN temp_category STARTS WITH "'" AND temp_category ENDS WITH "'" 
+        THEN substring(temp_category, 1, size(temp_category)-2)
+        WHEN temp_category STARTS WITH "'" 
+        THEN substring(temp_category, 1)
+        WHEN temp_category ENDS WITH "'" 
+        THEN substring(temp_category, 0, size(temp_category)-1)
+        ELSE temp_category 
+    END as trimmed_category, m
+    WHERE trimmed_category <> ''
+    RETURN trimmed_category as category, COUNT(DISTINCT m) as count
+    """
+    results = exec_query(driver, query, parameters={"main_categories": selected_main_categories})
+    
+    category_counts = {record['category']: record['count'] for record in results}
+    
+    driver.close()
+    print(category_counts)
+    json = jsonify({'category_counts': category_counts})
+    print(json)
+    return json

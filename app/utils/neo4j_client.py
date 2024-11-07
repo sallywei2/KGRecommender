@@ -14,18 +14,29 @@ def get_driver():
     print(f"Connected to Neo4J instance at {NEO4J_URI}")
     return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
-def exec_query(driver, q, db="neo4j"):
+def exec_query(driver, q, parameters=None, db="neo4j"):
     """
     Generic function for executing queries against the Neo4j database.
     This function will execute the query and return a dataframe.
+    
+    Args:
+        driver: Neo4j driver instance
+        q: Query string
+        parameters: Dictionary of query parameters (optional)
+        db: Database name (defaults to "neo4j")
     """
+    # If no parameters provided, use empty dict
+    parameters = parameters or {}
+    
     records, summary, keys = driver.execute_query(
         q,
+        parameters_=parameters, 
         database_=db,
     )
 
     print("Query `{query}` returned {records_count} records in {time} ms.".format(
-        query=summary.query, records_count=len(records),
+        query=summary.query, 
+        records_count=len(records),
         time=summary.result_available_after
     ))
 

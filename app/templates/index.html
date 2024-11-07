@@ -6,7 +6,7 @@
     <title>Ecommerce Recommendation System</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
+    {% include 'navbar_css.html' %}
 <style>
      body {
             background-color: #f8f9fa;
@@ -38,32 +38,11 @@
             color: #fff; /* Set modal content text color for dark theme */
         }
 </style>
+</head>
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand mx-auto" href="#">Ecommerce Recommendation System</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link btn btn-outline-primary mr-2" href="#" data-toggle="modal" data-target="#signupModal">Sign Up</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link btn btn-primary" href="#" data-toggle="modal" data-target="#signinModal">Sign In</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+{% include 'navbar.html' %}
 
 
 <!-- Video Section Without Carousel -->
@@ -283,49 +262,7 @@
 
 
 <!--footer-->
-<footer class="footer bg-dark text-white">
-    <div class="container" style="padding-top:20px;">
-        <div class="row">
-            <div class="col-md-3 col-sm-6">
-                <h5>About Us</h5>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pretium risus quis urna maximus, eget vestibulum risus vestibulum.</p>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <h5>Support</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <h5>Contact Us</h5>
-                <address>
-                    <strong>Company Name</strong><br>
-                    123 Street, City<br>
-                    Country<br>
-                    <i class="fas fa-phone"></i> Phone: +1234567890<br>
-                    <i class="fas fa-envelope"></i> Email: info@example.com
-                </address>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <hr class="bg-light">
-                <p class="text-center">© 2024 Ecommerce Recommendation System. All Rights Reserved.</p>
-            </div>
-        </div>
-    </div>
-</footer>
+{% include 'footer.html' %}
 
 
 </body>

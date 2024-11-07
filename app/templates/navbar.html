@@ -1,0 +1,27 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand mx-auto" href="/">Ecommerce Recommendation System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+        </li>
+        <li><a class="nav-link" href="{{ url_for('graph.visualization') }}">>View Graph Visualization</a>
+        </li>
+  
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-primary mr-2" href="#" data-toggle="modal" data-target="#signupModal">Sign Up</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-primary" href="#" data-toggle="modal" data-target="#signinModal">Sign In</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  

@@ -35,6 +35,10 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:/Users/lawfu/Documents/deft-re
 NEO4J_URI = "neo4j+s://508011ec.databases.neo4j.io"
 NEO4J_USERNAME = "neo4j"
 NEO4J_PASSWORD = "WVdTBF4CkcyCgzVTrUoCQsXQCSLi0qBLjp_st-EClTw"
+
+NEO4J_URI = "bolt://localhost:7687"
+NEO4J_USERNAME = "neo4j"
+NEO4J_PASSWORD = "password"
 """
 
 ### Mouni

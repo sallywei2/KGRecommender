@@ -4,13 +4,14 @@ from neo4j import GraphDatabase
 import os
 import google.cloud.storage as gcs
 
+from utils.neo4j_client import get_driver
+from flask_graph_visualization import graph  
+
 app = Flask(__name__)
+app.register_blueprint(graph) 
 
 # Neo4j configuration
-NEO4J_URI = os.environ.get("NEO4J_URI")
-NEO4J_USER = os.environ.get("NEO4J_USER")
-NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
-driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+driver = get_driver()
 
 # Route for homepage
 @app.route("/")
