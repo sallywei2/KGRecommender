@@ -7,6 +7,12 @@ class Mode(Enum):
 
 MODEL_MODE = Mode.Graph #default mode
 
+# Vertex AI
+GEMINI_MODEL = "gemini-1.5-flash-002"
+GEMINI_MODEL_REGION = "us-central1"
+
+FLANT5_ENDPOINT = "projects/371748443295/locations/us-west1/endpoints/8518052919822516224"
+
 ### Nandini
 """
 # Google Cloud Project
@@ -46,12 +52,7 @@ NEO4J_PASSWORD = "WVdTBF4CkcyCgzVTrUoCQsXQCSLi0qBLjp_st-EClTw"
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USERNAME = "neo4j"
 NEO4J_PASSWORD = "password"
-
-# Vertex AI
-GENERATIVE_MODEL = "gemini-1.5-flash-002"
-MODEL_REGION = "us-central1"
 """
-
 ### Mouni
 """
 # Google Cloud Project
