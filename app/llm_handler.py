@@ -107,7 +107,10 @@ class LLMHandler:
 
     def _get_text_from_cypher_response(self, response):
         cypher_text = self._get_text_from_model_response(response)
-        cypher_query = cypher_text.split('```cypher\n')[1].split('\n```')[0]
+        if 'cypher' in cypher_text:
+            cypher_query = cypher_text.split('```cypher\n')[1].split('\n```')[0]
+        else:
+            cypher_query = cypher_text
         return cypher_query
 
     def _get_text_from_model_response(self, response):
