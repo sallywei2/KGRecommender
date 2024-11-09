@@ -40,6 +40,28 @@ class LLMHandler:
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
+    
+    def prompt_llm(self,prompt):
+        response = self.model.generate_content(prompt)
+        return self._get_text_from_model_response(response)
+    
+    def get_llm_response(self, user_query):
+        """
+        Example query:
+        "What's a good name for a flower shop that specializes in selling bouquets of dried flowers?"
+        """
+        if MODEL_MODE == Mode.Graph:
+            augmented_query = self._augment_from_graph(user_query)
+        elif MODEL_MODE == Mode.Vector:
+            augmented_query = self._augment_from_vector(user_query)
+
+        try:
+            model_response = self.model.generate_content(augmented_query)
+            print(f"Final query: {augmented_query}\nModel response: {model_response}")
+            return self._get_text_from_model_response(model_response)
+        except Exception as e:
+            print(f"Error generating content: {e}")
+            return ""
 
     def _augment_from_graph(self, user_query):
         # default non-augmented query
@@ -55,6 +77,7 @@ class LLMHandler:
                 main_categories=KnowledgeGraphLoader.GraphNodes.ontology_csv_category_mapping.values(),
                 user_query=user_query
                 )
+            print(f"Prompt for cypher:\n{prompt_for_cypher}")
             cypher_response = self.model.generate_content(prompt_for_cypher)
             print(f"Cypher response: {cypher_response}")
 
@@ -94,25 +117,3 @@ class LLMHandler:
             return response['text']
         else:
             return response
-
-    def get_llm_response(self, user_query):
-        """
-        Example query:
-        "What's a good name for a flower shop that specializes in selling bouquets of dried flowers?"
-        """
-        if MODEL_MODE == Mode.Graph:
-            augmented_query = self._augment_from_graph(user_query)
-        elif MODEL_MODE == Mode.Vector:
-            augmented_query = self._augment_from_vector(user_query)
-
-        try:
-            model_response = self.model.generate_content(augmented_query)
-            print(f"Final query: {augmented_query}\nModel response: {model_response}")
-            return self._get_text_from_model_response(model_response)
-        except Exception as e:
-            print(f"Error generating content: {e}")
-            return ""
-
-    def prompt_llm(self,prompt):
-        response = self.model.generate_content(prompt)
-        return self._get_text_from_model_response(response)
