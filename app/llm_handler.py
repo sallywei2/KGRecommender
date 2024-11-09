@@ -5,7 +5,7 @@ from google.cloud import storage
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
-from .utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL
+from .utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
 from .utils.rag_constants import Mode, MODEL_MODE
 from .utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
 from .utils.flant5_client import FlanT5Client
@@ -30,6 +30,7 @@ class LLMHandler:
             vertexai.init(project=PROJECT_ID, location=GEMINI_MODEL_REGION)
             self.model = GenerativeModel(GEMINI_MODEL)
         elif selected_model == AvailableLLMs.FLANT5:
+            vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = FlanT5Client()
 
         self.neo4j_driver = get_driver()
@@ -113,4 +114,5 @@ class LLMHandler:
             return ""
 
     def prompt_llm(self,prompt):
-        return self.model.generate_content(prompt).text
+        response = self.model.generate_content(prompt)
+        return self._get_text_from_model_response(response)
