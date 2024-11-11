@@ -13,11 +13,6 @@ from .utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
 from .utils.flant5_client import FlanT5Client
 from .utils.llama_client import LLAMAClient
 from .utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
-from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
-from utils.rag_constants import Mode, MODEL_MODE
-from utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
-from utils.flant5_client import FlanT5Client
-from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
@@ -153,7 +148,10 @@ class LLMHandler:
             print(n['title'])
             print(n['images'])
         """
-        split_response = llm_response.split("element_ids: ")
+        if type(llm_response) == vertexai.generative_models.GenerationResponse:
+            response = llm_response.text
+        
+        split_response = response.split("element_ids: ")
         recommendation_only = split_response[0]
         ids_only = split_response[1]
 

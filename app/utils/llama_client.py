@@ -19,16 +19,16 @@ class LLAMAClient:
            self._init_local()
 
     def generate_content(prompt):
-    """
-    Sends input to llama3.1-70b using the chat API and returns the response.
-    """
-    response = self.client.chat.completions.create(
-        model="llama3.1-70b",
-        messages=[
-            {"role": "system", "content": "You are an expert assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=200,
-        temperature=0.7
-    )
-    return response.choices[0].message.content.strip()
+        """
+        Sends input to llama3.1-70b using the chat API and returns the response.
+        """
+        response = self.client.chat.completions.create(
+            model="llama3.1-70b",
+            messages=[
+                {"role": "system", "content": "You are an expert assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=200,
+            temperature=0.7
+        )
+        return response.choices[0].message.content.strip()
