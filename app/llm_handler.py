@@ -43,7 +43,7 @@ class LLMHandler:
         elif selected_model == AvailableLLMs.FLANT5:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = FlanT5Client()
-        elif selected_model = AvailableLLMs.LLAMA:
+        elif selected_model == AvailableLLMs.LLAMA:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = LLAMAClient()
 

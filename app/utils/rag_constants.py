@@ -72,4 +72,4 @@ TABLE_ID = "clean_giftcard"
 """
 
 LLAMA_ENDPOINT = "https://api.llama-api.com"
-LLAMA_API_KEY = ""LA-dcab54ee6be342e3a9d518387fb66db22c05e43c71c7403bb658cd06f89f0fbd"
+LLAMA_API_KEY = "LA-dcab54ee6be342e3a9d518387fb66db22c05e43c71c7403bb658cd06f89f0fbd"
