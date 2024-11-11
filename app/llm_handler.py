@@ -1,15 +1,16 @@
 from enum import Enum
+import re
 
 from google.cloud import storage
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
-from .utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
-from .utils.rag_constants import Mode, MODEL_MODE
-from .utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
-from .utils.flant5_client import FlanT5Client
-from .utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
+from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
+from utils.rag_constants import Mode, MODEL_MODE
+from utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
+from utils.flant5_client import FlanT5Client
+from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
@@ -24,6 +25,8 @@ class LLMHandler:
     llm_handler = LLMHandler(AvailableLLMs.GEMINI)
     llm_handler.get_llm_response(user_query)
     """
+
+    retrieved_neo4j_records = []
 
     def __init__(self, selected_model):
         if selected_model == AvailableLLMs.GEMINI:
@@ -47,6 +50,10 @@ class LLMHandler:
     
     def get_llm_response(self, user_query):
         """
+        Returns:
+            llm_recommendation: the LLM's recommendation
+            selected_nodes: a list of Neo4j Nodes
+
         Example query:
         "What's a good name for a flower shop that specializes in selling bouquets of dried flowers?"
         """
@@ -58,10 +65,10 @@ class LLMHandler:
         try:
             model_response = self.model.generate_content(augmented_query)
             print(f"Final query: {augmented_query}\nModel response: {model_response}")
-            return self._get_text_from_model_response(model_response)
+            return self._get_response_and_selected_nodes(model_response)
         except Exception as e:
             print(f"Error generating content: {e}")
-            return ""
+            return "", ""
 
     def _augment_from_graph(self, user_query):
         # default non-augmented query
@@ -77,35 +84,31 @@ class LLMHandler:
                 main_categories=KnowledgeGraphLoader.GraphNodes.ontology_csv_category_mapping.values(),
                 user_query=user_query
                 )
-            print(f"Prompt for cypher:\n{prompt_for_cypher}")
-            cypher_response = self.model.generate_content(prompt_for_cypher)
-            print(f"Cypher response: {cypher_response}")
+            generated_cypher = self.model.generate_content(prompt_for_cypher)
 
             # Extract just the Cypher query from between the ```cypher and ``` markers
-            cypher_query = self._get_text_from_cypher_response(cypher_response)
+            cypher_query = self._get_text_from_generated_cypher(generated_cypher)                      
 
-            print(f"Cypher query: {cypher_query}")
-            r = exec_query(
+            self.retrieved_neo4j_records = exec_query(
                 self.neo4j_driver,
                 cypher_query
             )
-            print(f"Retrieved Cypher response: {r}")
             # Add the retrieved results to the prompt
             augmented_query = FINAL_PROMPT_TEMPLATE.format(
                 user_query=user_query,
-                response=r
+                response=self.retrieved_neo4j_records[:15] # cap at 10 nodes for now
             )
         except Exception as e:
             print(f"Could not retrieve related information from Neo4J: {e}")
-            r = "" # leave r blank
-    
+            self.retrieved_neo4j_records = []
+            
         return augmented_query
 
     def _augment_from_vector(self,user_query):
         # unimplemented
         return user_query
 
-    def _get_text_from_cypher_response(self, response):
+    def _get_text_from_generated_cypher(self, response):
         cypher_text = self._get_text_from_model_response(response)
         if 'cypher' in cypher_text:
             cypher_query = cypher_text.split('```cypher\n')[1].split('\n```')[0]
@@ -120,3 +123,42 @@ class LLMHandler:
             return response['text']
         else:
             return response
+
+    def _get_response_and_selected_nodes(self, llm_response, retrieved_neo4j_records=retrieved_neo4j_records):
+        """
+        Parameters:
+            llm_response: expected to be a recommendation followed by the string "element_ids: " and a list of Neo4j Node element_ids
+            retrieved_neo4j_records: the raw response retrieved from Neo4J
+
+        Returns:
+            recommendation_only: the LLM's recommendation with the node element_ids removed
+            selected_nodes: a list of Neo4j Nodes
+        
+        Example usage:
+
+        retrieved_nodes = llm_handler.retrieved_neo4j_records
+        llm_recommendation, selected_nodes = _get_selected_nodes(llm_response, retrieved_nodes)
+        for n in selected_nodes:
+            print(n['title'])
+            print(n['images'])
+        """
+        split_response = llm_response.split("element_ids: ")
+        recommendation_only = split_response[0]
+        ids_only = split_response[1]
+
+        # extract neo4j node element_ids from the llm_response
+        element_ids = []
+        ids = ids_only.split(',')
+        for id in ids:
+            element_ids.append(id.strip())
+
+        selected_nodes = []
+        # get the selected nodes from the retrieved_neo4j_records
+        for element_id in element_ids:
+            for record in retrieved_neo4j_records:
+                node = record[0]
+                if node.element_id == element_id:
+                    selected_nodes.append(node)
+
+        # return recommendation_only first to match with get_llm_response's return order
+        return recommendation_only, selected_nodes

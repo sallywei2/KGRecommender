@@ -10,6 +10,9 @@ from torch.utils.data import DataLoader
 from models.flant5.CustomDataset import CustomDataset
 from models.flant5.FlanT5 import T5FineTuner
 from transformers import (
+    T5Tokenizer,
+    T5ForConditionalGeneration,
+    TFT5ForConditionalGeneration,
     AutoTokenizer
 )
 import textwrap
@@ -24,25 +27,38 @@ class FlanT5Client:
     # local checkpoint fallback if cloud fails
     LOCAL_CKPT = "models/flant5/epoch=3-step=2072-train_loss=0.35.ckpt"
 
-    def __init__(self, use_cloud=False):
+    def __init__(self, use_cloud=False, use_pretrained=False):
        self.CLOUD = use_cloud
-       self.tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-small')
-
+       self.PRETRAINED = use_pretrained
+       
        if self.CLOUD:
            self._init_cloud() 
        else:
            self._init_local()
 
     def _init_local(self):
-        checkpoint = torch.load(self.LOCAL_CKPT)
-        print(checkpoint.keys())
+        """
+        Initialize tokenizer and model
+        """
+        if self.PRETRAINED:
+            self.tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-small')
 
-        self.llm = T5FineTuner.load_from_checkpoint(self.LOCAL_CKPT)
+            checkpoint = torch.load(self.LOCAL_CKPT)
+            print(f"Loaded local model from checkpoint: {checkpoint.keys()}")
+            self.llm = T5FineTuner.load_from_checkpoint(self.LOCAL_CKPT)
+            self.llm = self.llm.to("cpu") # use CPU since I don't have GPU
 
-        self.llm.model.eval() # set model to evaluation mode
-        self.llm = self.llm.to("cpu") # use CPU since I don't have GPU
+            self.model = self.llm.model
+            self.model.eval() # set model to evaluation mode
+        else:
+            self.tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-base")
+            self.model = TFT5ForConditionalGeneration.from_pretrained("google/flan-t5-base")        
 
     def _init_cloud(self):
+        """
+        Initialize tokenizer and API endpoint for the model hosted in the cloud
+        """
+        self.tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-small')
         client_options = {"api_endpoint": FLANT5_API_ENDPOINT}
         self.client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
 
@@ -76,6 +92,7 @@ class FlanT5Client:
         """
         Reformats text in FlanT5's CustomDataset format
         """
+        text = text[:512]
         df = pd.DataFrame(data={'title':['',''], 'sent':[text,'']}, index=[0,1])
         dataset = CustomDataset(tokenizer=self.tokenizer, dataset=df, type_path='test')
 
@@ -85,8 +102,8 @@ class FlanT5Client:
             attention_mask =  batch['source_mask']
             break
         
-        #input_ids = self._serialize_tensor(input_ids)
-        #attention_mask = self._serialize_tensor(attention_mask)
+        input_ids = self._serialize_tensor(input_ids)
+        attention_mask = self._serialize_tensor(attention_mask)
 
         return input_ids, attention_mask
 
@@ -96,16 +113,17 @@ class FlanT5Client:
         """
         # Convert tensor to NumPy array
         numpy_array = tensor.numpy()
-        tf_tensor = tf.convert_to_tensor(numpy_array, dtype=tf.int32)
+        #tf_tensor = tf.convert_to_tensor(numpy_array, dtype=tf.int32)
 
         # Serialize the NumPy array as JSON
         #json_string = json.dumps(numpy_array.tolist())
         #numpy_array#json_string
-        return tf_tensor
+        return numpy_array
 
     def _predict_locally(self, text):
         input_ids, attention_mask = self._get_instance(text)
-        return self.llm.model.generate(
+        print(input_ids)
+        return self.model.generate(
                     input_ids=input_ids,
                     attention_mask=attention_mask
                     )
@@ -147,5 +165,5 @@ class FlanT5Client:
         return response
 
     def decode_output(self, output):
-        decoded_output = [self.tokenizer.decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False).strip() for ids in output]
+        decoded_output = self.tokenizer.decode(output[0], skip_special_tokens=True, clean_up_tokenization_spaces=False).strip()
         return decoded_output

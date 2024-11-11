@@ -13,10 +13,12 @@
             padding: 20px;
             background-color: #f5f5f5;
             overflow-y: auto;
+            height: 100%;
+            flex-shrink: 0;
         }
         #graph {
             flex-grow: 1;
-            height: 100vh;
+            height: 100%;
             border-left: 1px solid lightgray;
             border-right: 1px solid lightgray;
         }
@@ -25,6 +27,8 @@
             padding: 20px;
             background-color: #f5f5f5;
             overflow-y: auto;
+            height: 100%;
+            flex-shrink: 0;
         }
         .filter-section {
             margin-bottom: 20px;
@@ -87,12 +91,17 @@
             transform: scale(1.05);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        .graph-container {
+            display: flex;
+            height: calc(100vh - 56px); /* Subtract navbar height */
+            width: 100%;
+            position: relative;
+        }
     </style>
 </head>
 <body>
     {% include 'navbar.html' %}
-    <!-- Graph Visualization -->
-    <div>
+    <div class="graph-container">
         <div id="sidebar">
             <h2>Filters</h2>
             <div class="filter-section">
@@ -148,7 +157,7 @@
             categories.forEach(cat => params.append('category', cat));
             
             // Update the graph
-            fetch('/graph-data?' + params.toString())
+            fetch('/graph/graph-data?' + params.toString())
                 .then(response => response.json())
                 .then(data => {
                     const nodes = new vis.DataSet(
@@ -209,7 +218,7 @@
                 });
             
             // Then, update category counts
-            fetch('/update-category-counts?' + params.toString())
+            fetch('/graph/update-category-counts?' + params.toString())
                 .then(response => response.json())
                 .then(data => {
                     // Only proceed if we have data
@@ -261,7 +270,7 @@
                 Array.from(document.querySelectorAll('input[name="mainCategory"]:checked'))
                     .forEach(cb => params.append('mainCategory', cb.value));
                 
-                fetch('/update-category-counts?' + params.toString())
+                fetch('/graph/update-category-counts?' + params.toString())
                     .then(response => response.json())
                     .then(data => {
                         Object.entries(data.category_counts).forEach(([category, count]) => {
