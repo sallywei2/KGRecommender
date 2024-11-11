@@ -6,6 +6,13 @@ from google.cloud import storage
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
+from .utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
+from .utils.rag_constants import Mode, MODEL_MODE
+from .utils.rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
+from .utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
+from .utils.flant5_client import FlanT5Client
+from .utils.llama_client import LLAMAClient
+from .utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
 from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
 from utils.rag_constants import Mode, MODEL_MODE
 from utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
@@ -14,7 +21,8 @@ from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_A
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
-    FLANT5 = 'Flan-T5'
+    FLANT5 = 'Flan-T5', 
+    LLAMA = "llama3.1-70b"
 
 class LLMHandler:
     """
@@ -35,6 +43,9 @@ class LLMHandler:
         elif selected_model == AvailableLLMs.FLANT5:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = FlanT5Client()
+        elif selected_model = AvailableLLMs.LLAMA:
+            vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
+            self.model = LLAMAClient()
 
         self.neo4j_driver = get_driver()
 
