@@ -6,13 +6,13 @@ from google.cloud import storage
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
-from .utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
-from .utils.rag_constants import Mode, MODEL_MODE
-from .utils.rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
-from .utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
-from .utils.flant5_client import FlanT5Client
-from .utils.llama_client import LLAMAClient
-from .utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
+from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
+from utils.rag_constants import Mode, MODEL_MODE
+from utils.rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
+from utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
+from utils.flant5_client import FlanT5Client
+from utils.llama_client import LLAMAClient
+from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
@@ -71,7 +71,7 @@ class LLMHandler:
         try:
             model_response = self.model.generate_content(augmented_query)
             print(f"Final query: {augmented_query}\nModel response: {model_response}")
-            return self._get_response_and_selected_nodes(model_response)
+            return self._get_response_and_selected_nodes(model_response, self.retrieved_neo4j_records)
         except Exception as e:
             print(f"Error generating content: {e}")
             return "", ""
@@ -150,6 +150,8 @@ class LLMHandler:
         """
         if type(llm_response) == vertexai.generative_models.GenerationResponse:
             response = llm_response.text
+        else:
+            response = llm_response
         
         split_response = response.split("element_ids: ")
         recommendation_only = split_response[0]
@@ -169,5 +171,24 @@ class LLMHandler:
                 if node.element_id == element_id:
                     selected_nodes.append(node)
 
+        if not self._nodes_have_data(selected_nodes):
+            selected_nodes = self._get_node_data_from_neo4j(selected_nodes)
+
         # return recommendation_only first to match with get_llm_response's return order
-        return recommendation_only, selected_nodes
+        return response, selected_nodes
+    
+    def _nodes_have_data(self, node_subset):
+        """
+        Check if the retrieved nodes have all the data we need for the frontend.
+        """
+        for node in node_subset:
+            if node["title"] == "" or node["description"] == "" or node["images"] == "":
+                return False
+        return True
+    
+    def _get_node_data_from_neo4j(self, selected_nodes):
+        element_ids = [node.element_id for node in selected_nodes]
+        return exec_query(self.neo4j_driver, 
+                   "MATCH (n) WHERE n.element_id IN $element_ids RETURN n",
+                   {"element_ids": element_ids}
+                   )
