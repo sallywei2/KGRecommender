@@ -6,19 +6,13 @@ from .rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
 class LLAMAClient:
     
     
-    def __init__(self, use_cloud=False):
-       self.CLOUD = use_cloud
+    def __init__(self):
        self.client = OpenAI(
             api_key = LLAMA_API_KEY,
             base_url = LLAMA_ENDPOINT
         )
 
-       if self.CLOUD:
-           self._init_cloud() 
-       else:
-           self._init_local()
-
-    def generate_content(prompt):
+    def generate_content(self, prompt):
         """
         Sends input to llama3.1-70b using the chat API and returns the response.
         """

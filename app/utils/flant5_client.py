@@ -7,8 +7,8 @@ import torch
 
 # prompt Flan-T5
 from torch.utils.data import DataLoader
-from app.models.flant5.CustomDataset import CustomDataset
-from app.models.flant5.FlanT5 import T5FineTuner
+from models.flant5.CustomDataset import CustomDataset
+from models.flant5.FlanT5 import T5FineTuner
 from transformers import (
     T5Tokenizer,
     T5ForConditionalGeneration,

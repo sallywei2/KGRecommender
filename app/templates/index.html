@@ -46,9 +46,8 @@
 
 
 <!-- Video Section Without Carousel -->
-<video src="/v.mp4" type="video/mp4" controls autoplay loop muted width="1500" height="500">
-  
-</video>
+<!--<video src="/v.mp4" type="video/mp4" controls autoplay loop muted width="1500" height="500">
+</video>-->
 
 <!-- Go To Main Page Button 
 <div class="text-center mt-5">
@@ -63,7 +62,58 @@
 
 <!--trending recommendations-->
 
+<div class="container mt-5">
+  <input type="text" id="userInput" placeholder="Enter your prompt here">
+  <button onclick="getLLMResponse()">Get Response</button>
+</div>
 
+<!-- Products -->
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Products</h2>
+  <div id="products" class="row mt-4">
+    {% for product in products %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+      <div class="card">
+          <img src="{{ product.images[0].thumb }}" class="card-img-top" alt="{{ product.title }}" style="height: 200px;">
+        <div class="card-body">
+          <h5 class="card-title">{{ truncate(product.title,12) }}</h5>
+          <p class="card-text">Description: {{ truncate(product.description,100) }}</p>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal{{ index }}">Buy Now</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="productModal{{ index }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="productModalLabel">{{ product['title'] }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4">
+                  <img src="getImageUrl({{ product['images'] }})" class="img-fluid" alt="{{ product['title'] }}" style="height: 200px;">
+              </div>
+              <div class="col-md-8">
+                <p><strong>Description:</strong> {{ product['description'] }}</p>
+                <!-- Add more details as needed -->
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 
 
 <!-- Bootstrap modal for sign up -->
@@ -170,6 +220,110 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
+  function getImageUrl(images) {
+      try {
+          // Convert the string to a valid JSON array
+          let jsonString = images
+              .replace(/'/g, '"')        // Replace single quotes with double quotes
+              .replace(/None/g, 'null')  // Replace Python None with JavaScript null
+              .replace(/\s+/g, ' ');     // Normalize whitespace
+          
+          // Split the string into individual objects and wrap in array
+          const imageObjects = jsonString.split('}, {').map(str => {
+              // Clean up the string and ensure proper JSON format
+              return str
+                  .replace(/^{/, '')     // Remove leading {
+                  .replace(/}$/, '')     // Remove trailing }
+                  .trim();
+          });
+          
+          // Reconstruct as a proper JSON array
+          jsonString = '[{' + imageObjects.join('}, {') + '}]';
+          
+          const imageDataArray = JSON.parse(jsonString);
+          return imageDataArray[0].thumb.trim()
+
+      } catch (e) {
+          console.error('Error parsing image data:', e);
+          console.error('Original value:', images);
+          return 'static/placeholder_img.png'
+      }
+    }
+  function getLLMResponse() {
+      // Get the value from the text input
+      const userInput = document.getElementById("userInput").value;
+      
+      const params = new URLSearchParams();
+      params.append('query', userInput);
+
+      // Send the value to the /get_response route
+      fetch('/get_response', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Do something with the response data
+          // load data into the website.
+          console.log(data);  // For example, log the response to the console
+          
+          recommendation_text = data["text"];
+          products = data["products"];
+
+          productsDiv = document.getElementById("products");
+
+          // build product html
+          productsDiv.innerHTML = products.map((product, index) => {
+            image = getImageUrl(product.images);
+            return `
+              <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <img src="${image}" class="card-img-top" alt="${product.title}" style="height: 200px;">
+                  <div class="card-body">
+                    <h5 class="card-title">${product.title}</h5>
+                    <p class="card-text">Description: ${product.description}</p>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal${index}">Buy Now</button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Modal -->
+              <div class="modal fade" id="productModal${index}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="productModalLabel">${product.title}</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="col-md-4">
+                            <img src="${image}" class="img-fluid" alt="${product.title}" style="height: 200px;">                        
+                        </div>
+                        <div class="col-md-8">
+                          <p><strong>Description:</strong>${product.description}</p>
+                          <!-- Add more details as needed -->
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Add to Cart</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+      })    
+      .catch(error => console.error("Error:", error));
+  }
+  
   // Handle click on Settings link to open the modal
   document.getElementById('settingsLink').addEventListener('click', function() {
     $('#settingsModal').modal('show');

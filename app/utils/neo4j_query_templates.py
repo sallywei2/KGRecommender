@@ -14,7 +14,7 @@ PROMPT_TEMPLATE_NO_AUGMENTATION = """
 """
 
 FINAL_PROMPT_TEMPLATE = """
-Provide up to six recommendations to the user based on the user query. Related information are included in the Response section below. Provide the node element_ids at the end of the response.
+Provide up to six recommendations to the user based on the user query. Related information are included in the Response section below. Provide the nodes' element_ids at the end of the response, after the word "element_ids:".
 
 User query:
 {user_query}
