@@ -8,6 +8,12 @@ Github Desktop will prompt you for a location to download the code repository to
 
 ### Install Python Dependencies
 
+	# models
+	pip install torch
+	pip install pytorch-lightning
+	pip install tensorflow
+	pip install tf-keras
+
 	# neo4j, graph data science
 	pip install neo4j
 	pip install py2neo
