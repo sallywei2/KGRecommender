@@ -44,7 +44,7 @@ DATASET_ID = "JSON_DATASET"
 TABLE_ID = "clean_giftcard"
 
 # Dataflow API Service Account Key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:/Users/lawfu/Documents/deft-return-439619-h9-151ce547a5fd.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/static/deft-return-439619-h9-151ce547a5fd.json"
 
 # Neo4j
 #NEO4J_URI = "neo4j+s://508011ec.databases.neo4j.io"
