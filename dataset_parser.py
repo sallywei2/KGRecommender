@@ -122,9 +122,13 @@ class DatasetParser():
         """
         Loads pickle file of saved dataset from file.
         """
-        with open(filename, 'rb') as f:
-            self.table= pickle.load(f)
-        print(f"Loaded parsed dataset from file: {filename}")
+        try:
+            with open(filename, 'rb') as f:
+                self.table = pickle.load(f)
+            print(f"Loaded parsed dataset from file: {filename}")
+        except Exception as e:
+            print(f"Error while loading from pickle file {filename}: {e}")
+            raise e
 
 
     def _convert_col_to_dict(self, col):
@@ -163,29 +167,35 @@ class DatasetParser():
 class ParsedDatasetRow():
     def __init__(self, raw_fields, set_of_seen_attributes):
         self.set_of_seen_attributes = set_of_seen_attributes # must go before combine_fields
-        self.fields = self.combine_fields(raw_fields)        
-
+        self.fields = self.combine_fields(raw_fields)
+        
     def combine_fields(self, raw_fields):
         """
         fields: a list of dictionaries or lists to combine into a dictionary
         returns: a dictionary with unique values for each key
         """
-        self.super_dict = collections.defaultdict(set) # no duplicates in values of a key
+        super_dict = collections.defaultdict(set) # no duplicates in values of a key
         
         for d in raw_fields:
             if type(d) == dict:
-                self._process_dict(d)
+                self._process_dict(super_dict, d)
             elif type(d) == list:
                 try:
                     k = '???'
                     for v in d:
                         v = self._clean_value(self.v_item)
-                        self.super_dict[k] = v
+                        super_dict[k] = v
                 except Exception as e:
                     print(f"ERROR in combine_fields when adding list to super_dict: {e}")
                     print(f"k: {k}, v: {type(v)} {v}")
                     raise e
-        return self.super_dict
+        
+        # convert defaultdict into a regular python dict
+        super_dict_converted = {}
+        for k, v in super_dict.items():
+            super_dict_converted[k] = tuple(tuple(x) if isinstance(x, list) else x for x in v)
+
+        return super_dict_converted
 
     def print(self):
         for k,v in self.fields.items():
@@ -196,7 +206,7 @@ class ParsedDatasetRow():
             else:
                 print(f"    {k}: {v}")
 
-    def _process_dict(self, d):
+    def _process_dict(self, super_dict, d):
         try:
             for k, v in d.items():
                 k, v = self._parse_features(k, v)
@@ -207,14 +217,14 @@ class ParsedDatasetRow():
                             for i in v_item.split(','):
                                 i = self._clean_value(i)
                                 if i != '':
-                                    self.super_dict[k].add(i)
+                                    super_dict[k].add(i)
                         else: # int, float...
-                            self.super_dict[k].add(v_item)
+                            super_dict[k].add(v_item)
                 elif type(v) == dict:
                     self._process_dict(v)
                 else:
                     v = self._clean_value(v)
-                    self.super_dict[k].add(v)
+                    super_dict[k].add(v)
         except Exception as e:
             print(f"ERROR in combine_fields when adding dict to super_dict: {e}")
             print(f"k: {k}, v: {type(v)} {v}")
@@ -257,11 +267,11 @@ class ParsedDatasetRow():
         # match existing 'best_sellers_rank' feature
         if type(v) == int or (type(v) == str and v.isdigit()):
             #if k not in ['average_rating', 'rating_number', 'model_year']:
-            unmatched = True
-            for match in ['rating', 'year', 'total', 'number']:
+            matched = False
+            for match in ['rating', 'year', 'total', 'number', 'upc']:
                 if match in k:
-                    unmatched = False
-            if unmatched:
+                    matched = True
+            if not matched:
                 v = (k, v)
                 k = 'best_sellers_rank'
         

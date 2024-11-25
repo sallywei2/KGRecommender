@@ -1,14 +1,16 @@
 """
 Authors: Nandini, Sally
 """
-from . import print_debug, bigquery_client
+from . import print_debug #, bigquery_client
 from .rag_constants import *
+from dataset_parser import DatasetParser
 
 from neo4j import GraphDatabase, Result
 import pandas as pd
 from rdflib import Graph as RDFGraph, Namespace, RDF, RDFS, OWL
 from py2neo import Graph as Neo4jGraph, Node, Relationship
 import os
+import collections
 
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
@@ -61,34 +63,34 @@ class KnowledgeGraphLoader():
             'All_Beauty': 'All Beauty',
             'Amazon_Fashion': 'AMAZON FASHION',
             'Amazon_Home': 'Amazon Home',
-            'Appliances': '',
+            'Appliances': 'Appliances',
             'Arts_Crafts_and_Sewing': 'Arts, Crafts & Sewing',
-            'Automotive': '',
-            'Baby_Products': '',
-            'Beauty_and_Personal_Care': '',
-            'Books': '',
-            'CDs_and_Vinyl': '',
-            'Cell_Phones_and_Accessories': '',
-            'Clothing_Shoes_and_Jewelry': '',
-            'Digital_Music': '',
+            'Automotive': 'Automotive',
+            'Baby_Products': 'Baby Products',
+            'Beauty_and_Personal_Care': 'Beauty & Personal Care',
+            'Books': 'Books',
+            'CDs_and_Vinyl': 'CDs & Vinyl',
+            'Cell_Phones_and_Accessories': 'Cell Phones & Accessories',
+            'Clothing_Shoes_and_Jewelry': 'Clothes, Shoes & Jewelry',
+            'Digital_Music': 'Digital Music',
             'Electronics': 'All Electronics',
             'Grocery_and_Gourmet_Food': 'Grocery',
-            'Handmade_Products': '',
-            'Health_and_Household': '',
+            'Handmade_Products': 'Handmade Products',
+            'Health_and_Household': 'Health & Household',
             'Health_and_Personal_Care': 'Health & Personal Care',
-            'Home_and_Kitchen': '',
-            'Industrial_and_Scientific': '',
-            'Kindle_Store': '',
-            'Magazine_Subscriptions': '',
-            'Movies_and_TV': '',
-            'Musical_Instruments': '',
+            'Home_and_Kitchen': 'Home & Kitchen',
+            'Industrial_and_Scientific': 'Industrial & Scientific',
+            'Kindle_Store': 'Kindle Store',
+            'Magazine_Subscriptions': 'Magazine Subscriptions',
+            'Movies_and_TV': 'Movies & TV',
+            'Musical_Instruments': 'Musical Instruments',
             'Office_Products': 'Office Products',
-            'Patio_Lawn_and_Garden': '',
-            'Pet_Supplies': '',
+            'Patio_Lawn_and_Garden': 'Patio, Lawn & Garden',
+            'Pet_Supplies': 'Pet Supplies',
             'Software': 'Software',
             'Sports_and_Outdoors': 'Sports & Outdoors',
-            'Subscription_Boxes': '',
-            'Tools_and_Home_Improvement': '',
+            'Subscription_Boxes': 'Subscription BOxes',
+            'Tools_and_Home_Improvement': 'Tools & Home Improvement',
             'Toys_and_Games': 'Toys & Games',
             'Video_Games': 'Video Games',
             'Unknown': 'Unknown',
@@ -97,7 +99,11 @@ class KnowledgeGraphLoader():
         def __init__(self, neo4j_graph):
             self.neo4j_graph = neo4j_graph
 
-        def get_or_make_node(self, node_label):
+        def get_or_make_node(self, node_type, node_label, **attributes):
+            if type(node_label) == tuple:
+                node_label = ''.join(node_label)
+            attributes = self._reformat_attributes(attributes)
+
             if node_label in self.ontology_csv_category_mapping:
                 mapped_node_label = self.ontology_csv_category_mapping[node_label]
                 if mapped_node_label:
@@ -107,23 +113,51 @@ class KnowledgeGraphLoader():
             if node_label in self.nodes:
                 node = self.nodes[node_label]
             else:
-                node = Node(node_label)
+                print_debug(f"Creating node  ({node_label}:{node_type})")
+                for attr in attributes:
+                    print_debug(f"  {attr}: {attributes[attr]}")
+                node = Node(node_type, node_label, **attributes)
                 self.neo4j_graph.create(node)
                 self.nodes[node_label] = node
             return node
 
-    def __init__(self, ontology, csv_file=""):
+        def _reformat_attributes(self, attributes):
+            # py2neo expects attributes of a node to be strings, not tuples.
+            # convert tuple values into string values before creating a Node.
+            reformatted_attributes = {}
+            if attributes:
+                for attr in attributes:
+                    value = attributes.get(attr)
+                    if value:
+                        if type(value) == tuple:
+                            if len(value) > 1:
+                                converted_value = ', '.join(value)
+                            else:
+                                converted_value = value[0]
+                            if converted_value:
+                                reformatted_attributes[attr] = converted_value 
+                        elif type(value) in (str, int, float):
+                            reformatted_attributes[attr] = value
+            return reformatted_attributes
+
+
+    def __init__(self, ontology, csv_file="", pickle_file=""):
         self.ontology = ontology
         self.csv_file = csv_file
+        self.pickle_file = pickle_file
         self.load_ontology()
 
         if csv_file:
             # Read local CSV Data
             self.csv_data = pd.read_csv(self.csv_file)
-        else:
+        #else:
             # Read CSV data from BigQuery
-            self.csv_data = bigquery_client.get_dataset()
+            #self.csv_data = bigquery_client.get_dataset()
 
+        if pickle_file:
+            self.parsed_dataset = DatasetParser()
+            self.parsed_dataset.load_from_file(pickle_file)
+            
     def load_ontology(self, ontology=""):
         if ontology == "":
             ontology = self.ontology
@@ -151,15 +185,18 @@ class KnowledgeGraphLoader():
     
         self.neo4j_graph = Neo4jGraph(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
         self.class_nodes = self.GraphNodes(self.neo4j_graph)
+        self.product_nodes = self.GraphNodes(self.neo4j_graph)
 
         # Create the knowledge graph in Neo4j
         # load item categories; node classes and subclasses
-        self._load_knowledge_graph_classes()
-        print(f"Loaded {len(self.class_nodes.nodes)} classes from {self.ontology}")
+        #self._load_knowledge_graph_classes()
+        #print(f"Loaded {len(self.class_nodes.nodes)} classes from {self.ontology}")
             
         self._load_products()
         if self.csv_file:
             print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.csv_file}")
+        elif self.pickle_file:
+            print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.pickle_file}")
         else:
             print(f"Loaded products in {len(self.class_nodes.nodes)} classes from BiqQuery")
     
@@ -201,7 +238,7 @@ class KnowledgeGraphLoader():
         for cls in classes:
             subdict = classes[cls]
     
-            main_node = class_nodes.get_or_make_node(cls)
+            main_node = class_nodes.get_or_make_node("Main Category", cls)
             
             for relationship in subdict:
                 if subdict[relationship]:
@@ -210,35 +247,90 @@ class KnowledgeGraphLoader():
     
                     for s in subclasses:
                         prop = relationship
-                        prop_node = class_nodes.get_or_make_node(s)
+                        prop_node = class_nodes.get_or_make_node("Category", s)
                         rel = Relationship(main_node, prop, prop_node)
                         neo4j_graph.create(rel)
     
     def _load_products(self):
-        neo4j_graph = self.neo4j_graph
-        csv_data = self.csv_data
-        category_nodes = self.class_nodes
+        if self.csv_file != "":
+            csv_data = self.csv_data
+            for _, row in csv_data.iterrows():
+                self._load_product_from_row(row)
+        if self.pickle_file != "":
+            for row in self.parsed_dataset.table:
+                self._load_product_from_row(row.fields)
+    
+    def _load_product_from_row(self, row):
+        main_category = row.get('mainCategory')
+        if not main_category:
+            main_category = row.get('main_category')
+        main_category = str(main_category)
         
-        for _, row in csv_data.iterrows():
-            main_category = row['mainCategory']
-    
-            # Skip rows with missing mainCategory
-            if pd.isna(main_category):
-                continue
-    
-            # Ensure main_category is not None and is a string
-            main_category = str(main_category)
-            title = row['title']
-    
-            # Filter attributes, making sure none of them are None
-            attributes = {k: v for k, v in row.to_dict().items() if isinstance(v, (int, float, str)) and pd.notna(v)}
-            main_node = Node("Product", title, **attributes)
-    
-            for attr in attributes:
-                if attr == 'mainCategory':
-                    category = attributes[attr]
-                    attr_node = category_nodes.get_or_make_node(category)
-                    rel = Relationship(main_node, attr, attr_node)
-                    neo4j_graph.create(rel)
-                    print_debug(f"Loaded node-rel-node: {title}, {attr}, {category}")
+        title = row['title']
 
+        attributes = row
+        if type(row) != dict:
+            row = row.to_dict()
+            attributes = {k: v for k, v in row.items() if isinstance(v, (int, float, str)) and pd.notna(v)}
+
+        self._add_product_nodes_and_relationships(title, attributes)
+
+    def _add_product_nodes_and_relationships(self, title, attributes):
+
+        main_node = self.product_nodes.get_or_make_node("Product", title, **attributes)
+    
+        for attr in attributes:
+
+            attr_node_label = ""
+            attr_values = attributes[attr]
+
+            relationships_to_add = {
+                'mainCategory':'Main Category' # csv
+                , 'main_category': 'Main Category' # pickle
+                , 'categories':'Category'
+                , 'store':'Store'
+            }
+
+            if attr in relationships_to_add:
+                attr_node_label = relationships_to_add[attr]
+            
+            if attr_node_label:
+                if attr == 'categories':
+                    parentCategory = attributes.get('main_category') or attributes.get('mainCategory')
+                    if parentCategory:
+                        # relate subcategory with main cateogry
+                        self._add_node_and_relationship(
+                            main_node = self.class_nodes.get_or_make_node("Main Category", parentCategory)
+                            , relationship = attr
+                            , attr_node_label = attr_node_label
+                            , attr_node_title = attr_values
+                        )
+                # create a node for the attribute and relate it to the product
+                self._add_node_and_relationship(
+                    main_node = main_node
+                    , relationship = attr
+                    , attr_node_label = attr_node_label
+                    , attr_node_title = attr_values)
+
+
+    def _add_node_and_relationship(self, main_node, relationship, attr_node_label, attr_node_title):
+        """
+        product_node: a product Node
+        relationship: the attribute name. (e.g. brand, feature, catgory)
+        attr_node_label: string. Category, Main Category, Brand, etc.
+        attr_node_title: string.
+        """
+        if type(attr_node_title) == tuple:
+            for title in attr_node_title:
+                self._add_node_and_relationship(
+                    main_node = main_node
+                    , relationship = relationship
+                    , attr_node_label = attr_node_label
+                    , attr_node_title = title)
+        elif type(attr_node_title) in (str, int, float):
+            print_debug(f"Adding relationship...  (n)-[{relationship}]->({attr_node_title}:{attr_node_label})")
+            attr_node = self.class_nodes.get_or_make_node(attr_node_label, attr_node_title)
+            rel = Relationship(main_node, relationship, attr_node)
+            self.neo4j_graph.create(rel)
+        else:
+            print_debug(f"Skipping relationship: {relationship}, {type(attr_node_title)} {attr_node_title}")
