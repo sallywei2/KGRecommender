@@ -173,6 +173,24 @@ class ParsedDatasetRow():
         """
         fields: a list of dictionaries or lists to combine into a dictionary
         returns: a dictionary with unique values for each key
+
+        e.g., raw_fields = [
+            {'title': '1 Pair Mink 3D False Eyelashes Handmade Thick Nature Fluffy Long Fake Eye Lashes Reusable Wear (1pair/mt01)'
+            , 'main_category': 'All Beauty'
+            , 'average_rating': 2.7
+            , 'rating_number': 7
+            , 'price': ''
+            , 'store': 'jingewell'
+            , 'parent_asin': 'B07DNX5JYY'
+            , 'bought_together': ''
+            , 'subtitle': ''
+            , 'author': ''
+            }, { 'Package Dimensions': '4.4 x 1.92 x 0.66 inches; 0.32 Ounces'
+            , 'UPC': '603935193740'
+            }, (), {'categories': ()}, 
+            {'description': ()}
+        ]
+
         """
         super_dict = collections.defaultdict(set) # no duplicates in values of a key
         
@@ -210,6 +228,8 @@ class ParsedDatasetRow():
         try:
             for k, v in d.items():
                 k, v = self._parse_features(k, v)
+                if not k or not v: # skip if either key or value are empty
+                    continue
                 self.set_of_seen_attributes.add(k)
                 if type(v) == list:
                     for v_item in v:
@@ -221,10 +241,11 @@ class ParsedDatasetRow():
                         else: # int, float...
                             super_dict[k].add(v_item)
                 elif type(v) == dict:
-                    self._process_dict(v)
+                    self._process_dict(super_dict, v)
                 else:
                     v = self._clean_value(v)
-                    super_dict[k].add(v)
+                    if v:
+                        super_dict[k].add(v)
         except Exception as e:
             print(f"ERROR in combine_fields when adding dict to super_dict: {e}")
             print(f"k: {k}, v: {type(v)} {v}")
@@ -268,7 +289,7 @@ class ParsedDatasetRow():
         if type(v) == int or (type(v) == str and v.isdigit()):
             #if k not in ['average_rating', 'rating_number', 'model_year']:
             matched = False
-            for match in ['rating', 'year', 'total', 'number', 'upc']:
+            for match in ['rating', 'year', 'total', 'number', 'upc', 'store', 'brand', 'parent_asin']:
                 if match in k:
                     matched = True
             if not matched:

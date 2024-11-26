@@ -3,7 +3,7 @@ Authors: Nandini, Sally
 """
 from . import print_debug #, bigquery_client
 from .rag_constants import *
-from dataset_parser import DatasetParser
+from .dataset_parser import DatasetParser
 
 from neo4j import GraphDatabase, Result
 import pandas as pd
@@ -100,45 +100,83 @@ class KnowledgeGraphLoader():
             self.neo4j_graph = neo4j_graph
 
         def get_or_make_node(self, node_type, node_label, **attributes):
-            if type(node_label) == tuple:
-                node_label = ''.join(node_label)
-            attributes = self._reformat_attributes(attributes)
+            try:
+                if type(node_label) == tuple:
+                    node_label = ''.join(node_label)
+                reformatted_attributes = self._reformat_attributes(attributes)
 
-            if node_label in self.ontology_csv_category_mapping:
-                mapped_node_label = self.ontology_csv_category_mapping[node_label]
-                if mapped_node_label:
-                    print_debug(f"found mapped node label for {node_label}: {mapped_node_label}")
-                    node_label = mapped_node_label
-            
-            if node_label in self.nodes:
-                node = self.nodes[node_label]
-            else:
-                print_debug(f"Creating node  ({node_label}:{node_type})")
-                for attr in attributes:
-                    print_debug(f"  {attr}: {attributes[attr]}")
-                node = Node(node_type, node_label, **attributes)
-                self.neo4j_graph.create(node)
-                self.nodes[node_label] = node
-            return node
+                if node_label in self.ontology_csv_category_mapping:
+                    mapped_node_label = self.ontology_csv_category_mapping[node_label]
+                    if mapped_node_label:
+                        print_debug(f"found mapped node label for {node_label}: {mapped_node_label}")
+                        node_label = mapped_node_label
+                
+                if node_label in self.nodes:
+                    node = self.nodes[node_label]
+                else:
+                    print_debug(f"Creating node  ({node_label}:{node_type})")
+                    for attr in reformatted_attributes:
+                        print_debug(f"  {attr}: {reformatted_attributes[attr]}")
+                    node = Node(node_type, node_label, **reformatted_attributes)
+                    self.neo4j_graph.create(node)
+                    self.nodes[node_label] = node
+                return node
+            except Exception as e:
+                print(f"Error while trying to create the following node in neo4j: (({node_label}:{node_type}))\n  with reformatted attributes:")
+                for attr in reformatted_attributes:
+                    print(f"{attr}: {reformatted_attributes[attr]}")
+                raise e
 
         def _reformat_attributes(self, attributes):
-            # py2neo expects attributes of a node to be strings, not tuples.
-            # convert tuple values into string values before creating a Node.
+            """
+            py2neo/Neo4J expects attributes of a node to be strings, not tuples.
+            convert tuple values into string values before creating a Node.
+            """
             reformatted_attributes = {}
             if attributes:
                 for attr in attributes:
-                    value = attributes.get(attr)
-                    if value:
-                        if type(value) == tuple:
-                            if len(value) > 1:
-                                converted_value = ', '.join(value)
-                            else:
-                                converted_value = value[0]
-                            if converted_value:
-                                reformatted_attributes[attr] = converted_value 
-                        elif type(value) in (str, int, float):
-                            reformatted_attributes[attr] = value
+                    try:
+                        if not attr: # attr is not named, then skip it
+                            continue
+                        value = attributes.get(attr)
+                        if value:
+                            if type(value) == tuple:
+                                reformatted_attributes[attr] = self._convert_tuple_to_string(value)
+                            elif type(value) == list:
+                                reformatted_attributes[attr] = ','.join(value)
+                            elif type(value) in (str, int, float):
+                                reformatted_attributes[attr] = value
+                            print_debug(f"reformatted attribute {attr}: {value} -> {type(reformatted_attributes[attr])} {reformatted_attributes[attr]}")
+                    except Exception as e:
+                        print(f"Error while reformatting attribute {attr} with value: {type(value)} {value}")
+                        raise e
             return reformatted_attributes
+        
+        def _convert_tuple_to_string(self, t):
+            """
+            Recursive function to convert tuples to string
+            """
+            return_string = None
+
+            if type(t) == list:
+                return_string = ', '.join(t)
+            elif type(t) is not tuple:
+                return_string = t
+            else:
+                tuple_values = []
+                for v in t:
+                    if type(v) == tuple:
+                        s = self._convert_tuple_to_string(v)
+                        if s:
+                            tuple_values.append(s)
+                    else:
+                        if v:
+                            tuple_values.append(str(v))
+                return_string = ', '.join(tuple_values)
+            if type(return_string) == tuple:
+                # if the result is still a tuple, convert it again
+                return_string = self._convert_tuple_to_string(return_string)
+            return return_string
 
 
     def __init__(self, ontology, csv_file="", pickle_file=""):
@@ -265,8 +303,12 @@ class KnowledgeGraphLoader():
         if not main_category:
             main_category = row.get('main_category')
         main_category = str(main_category)
+        if not main_category:
+            return
         
-        title = row['title']
+        title = row.get('title')
+        if not title:
+            return
 
         attributes = row
         if type(row) != dict:
@@ -303,7 +345,7 @@ class KnowledgeGraphLoader():
                             main_node = self.class_nodes.get_or_make_node("Main Category", parentCategory)
                             , relationship = attr
                             , attr_node_label = attr_node_label
-                            , attr_node_title = attr_values
+                            , attr_node_title = parentCategory
                         )
                 # create a node for the attribute and relate it to the product
                 self._add_node_and_relationship(
