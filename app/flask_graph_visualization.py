@@ -16,7 +16,7 @@ except Exception as e:
     print(f"Failed to connect to Neo4j: {str(e)}. Please check if the Neo4j server is on and that the connection credentials are correctly set in utils/rag_constants.py")
     driver = None
 
-def get_categories():
+def get_categories(driver=driver):
     """
     Returns main categories, categories, main category counts, and category counts
     """
@@ -27,8 +27,8 @@ def get_categories():
         # Query for mainCategory counts
         main_cat_query = """
         MATCH (n)
-        WHERE n.mainCategory IS NOT NULL
-        WITH n.mainCategory as category, count(n) as count
+        WHERE n.main_category IS NOT NULL
+        WITH n.main_category as category, count(n) as count
         RETURN collect({category: category, count: count}) as counts
         """
             
@@ -81,7 +81,7 @@ def get_filtered_graph_data(main_categories=None, categories=None):
     try:
         conditions = []
         if main_categories:
-            conditions.append("n.mainCategory IN $main_categories")
+            conditions.append("n.main_category IN $main_categories")
         if categories:
             # Modified to check if any of the categories exist in the comma-separated string
             categories_condition = " OR ".join([
@@ -91,7 +91,7 @@ def get_filtered_graph_data(main_categories=None, categories=None):
             if categories_condition:
                 conditions.append(f"({categories_condition})")
         
-        where_clause = " OR ".join(conditions) if conditions else "true"
+        where_clause = " OR ".join(conditions) if conditions else "false" # don't show if no filters
         
         query = f"""
         MATCH (n)-[r]->(m)
@@ -133,7 +133,7 @@ def visualization():
 @graph.route('/graph-data')
 def get_graph():
     try:
-        main_cats = request.args.getlist('mainCategory')
+        main_cats = request.args.getlist('main_categories')
         cats = request.args.getlist('category')
         
         nodes, relationships = get_filtered_graph_data(
@@ -148,7 +148,7 @@ def get_graph():
 @graph.route('/update-category-counts')
 def update_category_counts():
     try:
-        selected_main_categories = request.args.getlist('mainCategory')
+        selected_main_categories = request.args.getlist('main_categories')
         
         # if no categories are selected, return empty result
         if not selected_main_categories:
@@ -157,7 +157,7 @@ def update_category_counts():
         driver = get_driver()
         query = """
         MATCH (n)-[]->(m)
-        WHERE n.mainCategory IN $main_categories
+        WHERE n.main_category IN $main_categories
         AND n.categories IS NOT NULL
         UNWIND split(n.categories, ',') as category
         WITH trim(category) as temp_category, m

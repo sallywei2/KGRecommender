@@ -45,9 +45,47 @@ def exec_query(driver, q, parameters=None, db="neo4j"):
     ))
 
     for r in records:  
-        print(r)
+        print_debug(r)
+        break;
     
     return records
+
+def records_to_dict(neo4j_records, node_properties):
+    """
+    Extracts properties from neo4j_records (a wrapper around neo4j nodes)
+    :node_properties: same as node_properties parameter of nodes_to_dict()
+    """
+    nodes = []
+    for r in neo4j_records:
+        node = r[0]
+        nodes.append(node)
+    return nodes_to_dict(nodes, node_properties)
+
+
+def nodes_to_dict(graph_nodes, node_properties):
+    """
+    Extracts properties from graph_nodes and formats them into a dictionary
+    :node_properties: an array of node properties. Assumes that the properties exist.
+    """
+    graph_nodes_dict = []
+    for node in graph_nodes:
+        node_dict_ele = {}
+        for property in node_properties:
+            if property == 'element_id':
+                if node.element_id:
+                    node_dict_ele[property] = node.element_id
+            else:
+                node_dict_ele[property] = node[property]
+        """
+        node_dict_ele = {
+            "element_id": node.element_id,
+            "title": node["title"],
+            "description": node["description"],
+            "images": node["images"]
+        }
+        """
+        graph_nodes_dict.append(node_dict_ele)
+    return graph_nodes_dict
 
 class KnowledgeGraphLoader():
 

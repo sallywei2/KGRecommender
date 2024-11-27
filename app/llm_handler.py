@@ -9,10 +9,12 @@ from vertexai.generative_models import GenerativeModel
 from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, FLANT5_MODEL_REGION
 from utils.rag_constants import Mode, MODEL_MODE
 from utils.rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
-from utils.neo4j_client import get_driver,exec_query, KnowledgeGraphLoader
+from utils.neo4j_client import get_driver,exec_query, nodes_to_dict, records_to_dict, KnowledgeGraphLoader
 from utils.flant5_client import FlanT5Client
 from utils.llama_client import LLAMAClient
 from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
+
+from flask_graph_visualization import get_categories
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
@@ -32,17 +34,25 @@ class LLMHandler:
     retrieved_neo4j_records = []
 
     def __init__(self, selected_model):
+        self.MAX_TOKEN_SIZE = 512 # default
+
         if selected_model == AvailableLLMs.GEMINI:
             vertexai.init(project=PROJECT_ID, location=GEMINI_MODEL_REGION)
             self.model = GenerativeModel(GEMINI_MODEL)
+            self.MAX_TOKEN_SIZE = 1000000 # 1 million
         elif selected_model == AvailableLLMs.FLANT5:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = FlanT5Client()
+            self.MAX_TOKEN_SIZE = 512
         elif selected_model == AvailableLLMs.LLAMA:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = LLAMAClient()
+            self.MAX_TOKEN_SIZE = 128000 # 120 thousand
 
         self.neo4j_driver = get_driver()
+
+        # get the current state of the knowledge graph
+        self.main_categories, self.categories, self.main_category_counts, self.category_counts = get_categories(self.neo4j_driver)
 
     def download_from_gcs(self,bucket_name, source_blob_name, destination_file_name):
         client = storage.Client()
@@ -63,18 +73,20 @@ class LLMHandler:
         Example query:
         "What's a good name for a flower shop that specializes in selling bouquets of dried flowers?"
         """
+        model_response = ''
+        cypher_query = ''
         if MODEL_MODE == Mode.Graph:
-            augmented_query = self._augment_from_graph(user_query)
+            augmented_query, cypher_query = self._augment_from_graph(user_query)
         elif MODEL_MODE == Mode.Vector:
             augmented_query = self._augment_from_vector(user_query)
 
         try:
             model_response = self.model.generate_content(augmented_query)
-            print(f"Final query: {augmented_query}\nModel response: {model_response}")
-            return self._get_response_and_selected_nodes(model_response, self.retrieved_neo4j_records)
+            print(f"Final query: {augmented_query[:5000]}\nModel response: {model_response}")
         except Exception as e:
             print(f"Error generating content: {e}")
-            return "", ""
+        finally:
+            return LLMResponse(self.neo4j_driver, model_response, self.retrieved_neo4j_records, cypher_query)
 
     def _augment_from_graph(self, user_query):
         # default non-augmented query
@@ -87,7 +99,8 @@ class LLMHandler:
             # Retrieve related information from Neo4J
             # Use the LLM to generate a Cypher query for us
             prompt_for_cypher = PROMPT_CYPHER_READ.format(
-                main_categories=KnowledgeGraphLoader.GraphNodes.ontology_csv_category_mapping.values(),
+                main_categories=self.main_categories,
+                categories=self.categories,
                 user_query=user_query
                 )
             generated_cypher = self.model.generate_content(prompt_for_cypher)
@@ -99,16 +112,25 @@ class LLMHandler:
                 self.neo4j_driver,
                 cypher_query
             )
+
+            condensed_graph_nodes = records_to_dict(
+                self.retrieved_neo4j_records
+                , ["element_id", "store", "description", "average_rating", "categories"])
+
             # Add the retrieved results to the prompt
             augmented_query = FINAL_PROMPT_TEMPLATE.format(
                 user_query=user_query,
-                response=self.retrieved_neo4j_records[:15] # cap at 10 nodes for now
+                response=condensed_graph_nodes
             )
+
+            # trunctae content to the maxmimum allowed by the model if it's oversized
+            if len(augmented_query) >= self.MAX_TOKEN_SIZE:
+                augmented_query = augmented_query[:self.MAX_TOKEN_SIZE]
         except Exception as e:
             print(f"Could not retrieve related information from Neo4J: {e}")
             self.retrieved_neo4j_records = []
             
-        return augmented_query
+        return augmented_query, cypher_query
 
     def _augment_from_vector(self,user_query):
         # unimplemented
@@ -117,10 +139,10 @@ class LLMHandler:
     def _get_text_from_generated_cypher(self, response):
         cypher_text = self._get_text_from_model_response(response)
         if 'cypher' in cypher_text:
-            cypher_query = cypher_text.split('```cypher\n')[1].split('\n```')[0]
+            extracted_query = cypher_text.split('```cypher\n')[1].split('\n```')[0]
         else:
-            cypher_query = cypher_text
-        return cypher_query
+            extracted_query = cypher_text
+        return extracted_query
 
     def _get_text_from_model_response(self, response):
         if type(response) == vertexai.generative_models.GenerationResponse:
@@ -130,7 +152,17 @@ class LLMHandler:
         else:
             return response
 
-    def _get_response_and_selected_nodes(self, llm_response, retrieved_neo4j_records=retrieved_neo4j_records):
+class LLMResponse:
+    def __init__(self, neo4j_driver, model_response, retrieved_neo4j_records , cypher_query=''):
+        self.neo4j_driver = neo4j_driver
+        self.cypher_query = cypher_query
+        self.text, self.graph_nodes = self._split_response_and_selected_nodes(model_response, retrieved_neo4j_records)
+        self.graph_nodes_dict = nodes_to_dict(
+          graph_nodes = self.graph_nodes
+        , node_properties = ["element_id", "title", "description", "images"]
+        )
+    
+    def _split_response_and_selected_nodes(self, llm_response, retrieved_neo4j_records):
         """
         Parameters:
             llm_response: expected to be a recommendation followed by the string "element_ids: " and a list of Neo4j Node element_ids
@@ -154,6 +186,8 @@ class LLMHandler:
             response = llm_response
         
         split_response = response.split("element_ids: ")
+        if len(split_response) == 1:
+            return response, []
         recommendation_only = split_response[0]
         ids_only = split_response[1]
 
@@ -175,8 +209,8 @@ class LLMHandler:
             selected_nodes = self._get_node_data_from_neo4j(selected_nodes)
 
         # return recommendation_only first to match with get_llm_response's return order
-        return response, selected_nodes
-    
+        return recommendation_only, selected_nodes
+
     def _nodes_have_data(self, node_subset):
         """
         Check if the retrieved nodes have all the data we need for the frontend.

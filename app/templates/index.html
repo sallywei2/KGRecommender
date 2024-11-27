@@ -63,10 +63,17 @@
 <!--trending recommendations-->
 
 <div class="container mt-5">
-  <input type="text" id="userInput" placeholder="Enter your prompt here">
+  <input class="container mt-5" type="text" id="userInput" placeholder="Enter your prompt here">
   <button onclick="getLLMResponse()">Get Response</button>
 </div>
 
+<div>
+  <b>LLM Response:</b><br/>
+  <div id="llm-response"></div>
+</div><div>
+  <b>The query the LLM generated and used to get information from the knowledge graph:</b><br/>
+  <div id="cypher-query"></div>
+</div>
 <!-- Products -->
 <div class="container mt-5">
   <h2 class="text-center mb-4">Products</h2>
@@ -250,6 +257,12 @@
       }
     }
   function getLLMResponse() {
+      // Provider user feedback
+      llmResponseDiv = document.getElementById("llm-response");
+      cypherDiv = document.getElementById("cypher-query");
+      llmResponseDiv.innerHTML = "Please wait; generating response..."
+      cypherDiv.innerHTML = ""
+
       // Get the value from the text input
       const userInput = document.getElementById("userInput").value;
       
@@ -272,8 +285,15 @@
           
           recommendation_text = data["text"];
           products = data["products"];
+          cypher_query = data["query"];
 
           productsDiv = document.getElementById("products");
+          llmResponseDiv = document.getElementById("llm-response");
+          cypherDiv = document.getElementById("cypher-query");
+
+          // add llm response and cypher
+          llmResponseDiv.innerHTML = recommendation_text
+          cypherDiv.innerHTML = cypher_query
 
           // build product html
           productsDiv.innerHTML = products.map((product, index) => {
@@ -284,8 +304,8 @@
                     <img src="${image}" class="card-img-top" alt="${product.title}" style="height: 200px;">
                   <div class="card-body">
                     <h5 class="card-title">${product.title}</h5>
-                    <p class="card-text">Description: ${product.description}</p>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal${index}">Buy Now</button>
+                    <p class="card-text"><!--Description: ${product.description}--></p>
+                    <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal${index}">Buy Now</button>-->
                   </div>
                 </div>
               </div>
@@ -313,7 +333,7 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary">Add to Cart</button>
+                      <!--<button type="button" class="btn btn-primary">Add to Cart</button>-->
                     </div>
                   </div>
                 </div>
