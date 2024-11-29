@@ -230,25 +230,9 @@
   function getImageUrl(images) {
       try {
           // Convert the string to a valid JSON array
-          let jsonString = images
-              .replace(/'/g, '"')        // Replace single quotes with double quotes
-              .replace(/None/g, 'null')  // Replace Python None with JavaScript null
-              .replace(/\s+/g, ' ');     // Normalize whitespace
-          
-          // Split the string into individual objects and wrap in array
-          const imageObjects = jsonString.split('}, {').map(str => {
-              // Clean up the string and ensure proper JSON format
-              return str
-                  .replace(/^{/, '')     // Remove leading {
-                  .replace(/}$/, '')     // Remove trailing }
-                  .trim();
-          });
-          
-          // Reconstruct as a proper JSON array
-          jsonString = '[{' + imageObjects.join('}, {') + '}]';
-          
+          let jsonString = images.replace("(","{[").replace(")","]}").replace("'",'"')
           const imageDataArray = JSON.parse(jsonString);
-          return imageDataArray[0].thumb.trim()
+          return imageDataArray[0].large.trim()
 
       } catch (e) {
           console.error('Error parsing image data:', e);
@@ -258,10 +242,12 @@
     }
   function getLLMResponse() {
       // Provider user feedback
+      productsDiv = document.getElementById("products");
       llmResponseDiv = document.getElementById("llm-response");
       cypherDiv = document.getElementById("cypher-query");
       llmResponseDiv.innerHTML = "Please wait; generating response..."
       cypherDiv.innerHTML = ""
+      productsDiv.innerHTML = ""
 
       // Get the value from the text input
       const userInput = document.getElementById("userInput").value;

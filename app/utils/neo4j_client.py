@@ -342,7 +342,7 @@ class KnowledgeGraphLoader():
             main_category = row.get('main_category')
         main_category = str(main_category)
         if not main_category:
-            return
+            main_category = "Uncategorized"
         
         title = row.get('title')
         if not title:

@@ -1,5 +1,4 @@
 from enum import Enum
-import re
 
 from google.cloud import storage
 
@@ -113,6 +112,7 @@ class LLMHandler:
                 cypher_query
             )
 
+            # node properties to pass to the LLM as context
             condensed_graph_nodes = records_to_dict(
                 self.retrieved_neo4j_records
                 , ["element_id", "store", "description", "average_rating", "categories"])
@@ -161,9 +161,18 @@ class LLMResponse:
           graph_nodes = self.graph_nodes
         , node_properties = ["element_id", "title", "description", "images"]
         )
+
+        # post-process images to JSON format
+        for ele in self.graph_nodes_dict:
+            imgs = ele.get("images")
+            if imgs:
+                imgs.replace("(","[").replace(")","]")
+                ele["images"] = imgs
     
     def _split_response_and_selected_nodes(self, llm_response, retrieved_neo4j_records):
         """
+        This function parses the raw llm response and formats it so it can be passed to the frontend.
+
         Parameters:
             llm_response: expected to be a recommendation followed by the string "element_ids: " and a list of Neo4j Node element_ids
             retrieved_neo4j_records: the raw response retrieved from Neo4J

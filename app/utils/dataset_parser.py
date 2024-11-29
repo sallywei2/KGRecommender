@@ -39,6 +39,7 @@ class DatasetParser():
         for i in range(len(chunk)):
             error = None
             dict_1 = None
+            images = None
             details = None
             features = None
             categories = None
@@ -59,6 +60,7 @@ class DatasetParser():
                 features = self._convert_col_to_list(chunk['features'].iloc[i])
                 categories = {'categories': self._convert_col_to_list(chunk['categories'].iloc[i])}
                 description = {'description': self._convert_col_to_list(chunk['description'].iloc[i])}
+                images = {'images': self._convert_col_to_list(chunk['images'].iloc[i])}
             except Exception as e:
                 error = f"when parsing details {details}" if details is None else f"when parsing features {features}"
 
@@ -67,7 +69,7 @@ class DatasetParser():
             finally:
                 # load everything into one dictionary
                 parsed_row = ParsedDatasetRow(
-                    raw_fields = [dict_1, details, features, categories, description]
+                    raw_fields = [dict_1, images, details, features, categories, description]
                     ,set_of_seen_attributes = self.set_of_seen_attributes
                     )
                 self.table.append(parsed_row)
@@ -144,8 +146,9 @@ class DatasetParser():
             return tuple(self._convert_to_tuples(element) for element in node.elts)
         elif isinstance(node, ast.Constant):
             return node.value
+        elif isinstance(node, ast.Dict):
+            return ast.literal_eval(ast.unparse(node))
         else:
-            print(f"type{node}")
             return node
 
     def _convert_col_to_list(self, col):
@@ -227,18 +230,32 @@ class ParsedDatasetRow():
     def _process_dict(self, super_dict, d):
         try:
             for k, v in d.items():
+                # handle images specially
+                if k == 'images':
+                    k, v = self.parse_images(k, v)
+                    super_dict[k].add(v)
+                    continue
+
+                # standardize and pre-process keys and values
                 k, v = self._parse_features(k, v)
                 if not k or not v: # skip if either key or value are empty
                     continue
+
+                # track all the keys that we've seen for analytics
                 self.set_of_seen_attributes.add(k)
-                if type(v) == list:
+                
+                # post-process values, add to super_dict, and recurse as necessary
+                if type(v) in [list, tuple]:
                     for v_item in v:
                         if type(v_item) == str:
                             for i in v_item.split(','):
                                 i = self._clean_value(i)
                                 if i != '':
                                     super_dict[k].add(i)
+                        elif type(v_item) == dict: # images
+                            self._process_dict(super_dict, v_item)
                         else: # int, float...
+                            v_item = self._clean_value(v_item)
                             super_dict[k].add(v_item)
                 elif type(v) == dict:
                     self._process_dict(super_dict, v)
@@ -248,8 +265,22 @@ class ParsedDatasetRow():
                         super_dict[k].add(v)
         except Exception as e:
             print(f"ERROR in combine_fields when adding dict to super_dict: {e}")
-            print(f"k: {k}, v: {type(v)} {v}")
+            print(f"Error occurred while processing k: {k}, v: {type(v)} {v}")
             raise e
+
+    def parse_images(self, k, v):
+        """
+        Images are structured as a list of imgsets, which are dictionaries
+        Each imgset has 'thumb', 'large', 'hi_res' image versions, 
+        plus a 'variant' which acts as a name for the imgset (e.g., PT01, MAIN)
+        """
+        """
+        for imgset in v:
+            is_main_image = (imgset.get('variant') == 'MAIN')
+            if is_main_image:
+                v = imgset['thumb']
+        """
+        return k, f"{json.dumps(v)}" # let the frontend pick the image from the graph database
 
     def _parse_features(self, k, v):
 
