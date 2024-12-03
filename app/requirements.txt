@@ -21,4 +21,5 @@ google-apitools == 0.5.31
 
 # visualization
 Flask==3.0.3
-pyvis-network
+pyvis-network>=0.0.6
+markdown==3.7
