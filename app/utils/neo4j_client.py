@@ -32,16 +32,13 @@ def exec_query(driver, q, parameters=None, db="neo4j"):
     # If no parameters provided, use empty dict
     parameters = parameters or {}
     
-    records, summary, keys = driver.execute_query(
-        q,
-        parameters_=parameters, 
-        database_=db,
-    )
+    with driver.session(database=db) as session:
+        result = session.run(q, **parameters)
+        records = list(result)
 
-    print("Query `{query}` returned {records_count} records in {time} ms.".format(
-        query=summary.query, 
-        records_count=len(records),
-        time=summary.result_available_after
+    print("Query `{query}` returned {records_count} record(s).".format(
+        query=q, 
+        records_count=len(records)
     ))
 
     for r in records:  

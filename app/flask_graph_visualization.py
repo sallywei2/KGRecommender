@@ -123,12 +123,17 @@ def get_filtered_graph_data(main_categories=None, categories=None):
 # Change route to blueprint route
 @graph.route('/')
 def visualization():
+    return render_template('graph.html')
+
+@graph.route('/get_categories')
+def get_categories_ajax():
     main_categories, categories, main_cat_counts, cat_counts = get_categories()
-    return render_template('graph.html', 
-                         main_categories=main_categories,
-                         categories=categories,
-                         main_cat_counts=main_cat_counts,
-                         cat_counts=cat_counts)
+    return jsonify({
+        'main_categories': main_categories,
+        'categories': categories,
+        'main_cat_counts': main_cat_counts,
+        'cat_counts': cat_counts
+    })
 
 @graph.route('/graph-data')
 def get_graph():

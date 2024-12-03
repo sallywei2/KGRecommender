@@ -6,35 +6,6 @@ Click the green "<> Code" button, then Open with Github Desktop.
 
 Github Desktop will prompt you for a location to download the code repository to. Continue with your selection to add the folder /KGRecommender to your selected file location.
 
-### Install Python Dependencies
-
-	# models
-	pip install torch
-	pip install pytorch-lightning
-	pip install tensorflow
-	pip install tf-keras
-
-	# neo4j, graph data science
-	pip install neo4j
-	pip install py2neo
-	pip install rdflib
-	pip install networkx[default]
-
-	# google cloud
-	pip install google-cloud
-	pip install google-cloud-bigquery
-	pip install google-cloud-storage
-	pip install google-cloud-aiplatform
-
-	# preprocessing pipeline and GCP
-	pip install apache_beam
-	pip install apache_beam[gcp]
-	pip install google-apitools
-
-	# visualization
-	pip install flask
-	pip install vis-network
-
 ## CLoud Setup
 
 ### Google Cloud Setup
@@ -108,6 +79,23 @@ Edit the following in utils/rag_constants.py to your own values:
 
 Enable Vertex AI in the GCP Console for your project.
 
+### Deploy to Google App Engine
+
+Enable Google App Engine.
+
+	gcloud init
+	gcloud app create
+
+Create the app in the same region as your bucket and other resources.
+
+Deploy the app to Google App Engine. Change to the directory with app.yaml in it.
+	cd KGRecommender/app
+	gcloud app deploy
+
+After deployment, the web app at https://PROJECT_ID.REGION_ID.r.appspot.com e.g., https://deft-return-439619-h9.uw.r.appspot.com
+or run 
+	gcloud app browse
+
 ## Local Setup
 
 ### Neo4J Desktop
@@ -123,7 +111,7 @@ Edit the following in utils/rag_constants.py to your own values. Below are the d
 	NEO4J_PASSWORD
 	GRAPH_NAME = 'myGraph'
 
-## Run Locally On Sample Data
+### Run Locally On Sample Data
 
 Start Neo4j Desktop.
 Start the default Neo4j database.
@@ -136,8 +124,24 @@ In Jupyter Notebook, open sample.ipynb
 
 Run the cells to load the knowledge graph into your local neo4J database.
 
+## Set up Local Environment
+
+Create a local isolated python environment, so the dependencies needed for this application won't interfere with other applications:
+	cd KGRecommender
+	python -m venv env
+	.\env\Scripts\activate
+
+To deactivate the environment, run the following command and delete the KGRecommender/env directory.
+	deactivate
+	rmdir /s /q env
+
+### Install Python Dependencies
+
+	cd KGRecommender/app
+	pip install -r requirements.txt
+
 ## Run Frontend Locally
 
 Run in a console:
 	python app/main.py
-Then visit http://localhost:5000 in a web browserto access the frontend.
+Then visit http://localhost:5000 in a web browser to access the frontend.

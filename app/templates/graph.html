@@ -144,7 +144,7 @@
     <script type="text/javascript">
         let network = null;
 
-        function loadGraphAndUpdateCounts() {
+        function loadGraphAndUpdateCounts(main_categories, categories, main_cat_counts, cat_counts) {
             // Get selected filters
             const mainCategories = Array.from(document.querySelectorAll('input[name="mainCategory"]:checked'))
                 .map(cb => cb.value);
@@ -260,6 +260,18 @@
                 });
         }
 
+        // Initial load: only render graph when the user requests it, rather than upon app startup
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_categories') // New AJAX request to fetch data
+                .then(response => response.json())
+                .then(data => {
+                    loadGraphAndUpdateCounts(data.main_categories, data.categories, data.main_cat_counts, data.cat_counts);
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                });
+        });
+
         document.getElementById('apply-filters').addEventListener('click', loadGraphAndUpdateCounts);
         
         // Also update counts when main categories are changed
@@ -282,9 +294,6 @@
                     });
             });
         });
-
-        // Initial load
-        loadGraphAndUpdateCounts();
 
         function showNodeDetails(node) {
             const detailsContainer = document.getElementById('node-details');

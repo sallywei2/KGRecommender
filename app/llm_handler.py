@@ -9,7 +9,6 @@ from utils.rag_constants import PROJECT_ID, GEMINI_MODEL_REGION, GEMINI_MODEL, F
 from utils.rag_constants import Mode, MODEL_MODE
 from utils.rag_constants import LLAMA_API_KEY, LLAMA_ENDPOINT
 from utils.neo4j_client import get_driver,exec_query, nodes_to_dict, records_to_dict, KnowledgeGraphLoader
-from utils.flant5_client import FlanT5Client
 from utils.llama_client import LLAMAClient
 from utils.neo4j_query_templates import PROMPT_CYPHER_READ, PROMPT_TEMPLATE_NO_AUGMENTATION, FINAL_PROMPT_TEMPLATE
 
@@ -17,7 +16,6 @@ from flask_graph_visualization import get_categories
 
 class AvailableLLMs(Enum):
     GEMINI = 'Gemini',
-    FLANT5 = 'Flan-T5', 
     LLAMA = "llama3.1-70b"
 
 class LLMHandler:
@@ -39,10 +37,6 @@ class LLMHandler:
             vertexai.init(project=PROJECT_ID, location=GEMINI_MODEL_REGION)
             self.model = GenerativeModel(GEMINI_MODEL)
             self.MAX_TOKEN_SIZE = 1000000 # 1 million
-        elif selected_model == AvailableLLMs.FLANT5:
-            vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
-            self.model = FlanT5Client()
-            self.MAX_TOKEN_SIZE = 512
         elif selected_model == AvailableLLMs.LLAMA:
             vertexai.init(project=PROJECT_ID, location=FLANT5_MODEL_REGION)
             self.model = LLAMAClient()

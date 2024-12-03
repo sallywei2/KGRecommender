@@ -1,6 +1,7 @@
 
 PROMPT_CYPHER_READ =  """
-Given the user query please construct a cypher query to retrieve from the database related entries. Only respond with the Cypher query and return the entire node.
+Given the user query, please construct a cypher query to retrieve related entries from the database. Prefer generic queries.
+Return the entire node. Only respond with the Cypher query.
 
 The available node properties are:
 * "main_category": {main_categories}
@@ -17,12 +18,13 @@ PROMPT_TEMPLATE_NO_AUGMENTATION = """
 """
 
 FINAL_PROMPT_TEMPLATE = """
-Provide up to six recommendations to the user based on the user query. Related information are included in the Response section below.
-Provide the element_id of each of the recommended items, separated by commas, at the very end of your response after the word "element_ids:".
+Based on the user query, recommend five products from the Context section below. Provide reasoning for each recommendation.
+
+After you have provided recommendations, print "element_ids:" followed by the element_id of each of the recommendations, separated by commas.
 
 User query:
 {user_query}
 
-Response:
+Context:
 {response}
 """
