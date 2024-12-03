@@ -11,11 +11,12 @@ from rdflib import Graph as RDFGraph, Namespace, RDF, RDFS, OWL
 from py2neo import Graph as Neo4jGraph, Node, Relationship
 import os
 import collections
+import logging
 
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
 def get_driver():
-    print(f"Connected to Neo4J instance at {NEO4J_URI}")
+    logging.info(f"Connected to Neo4J instance at {NEO4J_URI}")
     return driver
 
 def exec_query(driver, q, parameters=None, db="neo4j"):
@@ -36,7 +37,7 @@ def exec_query(driver, q, parameters=None, db="neo4j"):
         result = session.run(q, **parameters)
         records = list(result)
 
-    print("Query `{query}` returned {records_count} record(s).".format(
+    logging.info("Query `{query}` returned {records_count} record(s).".format(
         query=q, 
         records_count=len(records)
     ))
@@ -154,7 +155,8 @@ class KnowledgeGraphLoader():
                         print_debug(f"  {attr}: {reformatted_attributes[attr]}")
                     node = Node(node_type, node_label, **reformatted_attributes)
                     self.neo4j_graph.create(node)
-                    self.nodes[node_label] = node
+                    if node_type != "Product":
+                        self.nodes[node_label] = node
                 return node
             except Exception as e:
                 print(f"Error while trying to create the following node in neo4j: (({node_label}:{node_type}))\n  with reformatted attributes:")
@@ -183,7 +185,7 @@ class KnowledgeGraphLoader():
                                 reformatted_attributes[attr] = value
                             print_debug(f"reformatted attribute {attr}: {value} -> {type(reformatted_attributes[attr])} {reformatted_attributes[attr]}")
                     except Exception as e:
-                        print(f"Error while reformatting attribute {attr} with value: {type(value)} {value}")
+                        logging.error(f"Error while reformatting attribute {attr} with value: {type(value)} {value}")
                         raise e
             return reformatted_attributes
         
@@ -218,6 +220,7 @@ class KnowledgeGraphLoader():
         self.ontology = ontology
         self.csv_file = csv_file
         self.pickle_file = pickle_file
+        self.skipped_products = 0
         self.load_ontology()
 
         if csv_file:
@@ -242,19 +245,16 @@ class KnowledgeGraphLoader():
         self.classes = self._extract_classes(self.ontology_graph)
         self.properties = self._extract_properties(self.ontology_graph)
     
-    def load_knowledge_graph(self, reset=True):
+    def load_knowledge_graph(self, reset=True, start_at_row=0):
         """
         reset: whether to reset the knowledge graph in Neo4J
         """
         # perform a fresh load
-        if not reset:
-            print("Reset is set to False. No action to take.")
-            return
-        
-        with get_driver() as driver:
-            driver.session().run("MATCH (n) DETACH DELETE n")
-            driver.close()
-            print("Deleted existing graph; ready to load knowledge graph")
+        if reset:           
+            with get_driver() as driver:
+                driver.session().run("MATCH (n) DETACH DELETE n")
+                driver.close()
+                print("Deleted existing graph; ready to load knowledge graph")
     
         self.neo4j_graph = Neo4jGraph(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
         self.class_nodes = self.GraphNodes(self.neo4j_graph)
@@ -265,11 +265,11 @@ class KnowledgeGraphLoader():
         #self._load_knowledge_graph_classes()
         #print(f"Loaded {len(self.class_nodes.nodes)} classes from {self.ontology}")
             
-        self._load_products()
+        self._load_products(start_at_row=start_at_row)
         if self.csv_file:
             print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.csv_file}")
         elif self.pickle_file:
-            print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.pickle_file}")
+            print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.pickle_file}; skipped {self.skipped_products} without titles.")
         else:
             print(f"Loaded products in {len(self.class_nodes.nodes)} classes from BiqQuery")
     
@@ -324,14 +324,24 @@ class KnowledgeGraphLoader():
                         rel = Relationship(main_node, prop, prop_node)
                         neo4j_graph.create(rel)
     
-    def _load_products(self):
+    def _load_products(self, start_at_row):
+        num_rows_seen = 0
         if self.csv_file != "":
             csv_data = self.csv_data
             for _, row in csv_data.iterrows():
+                num_rows_seen = num_rows_seen + 1
+                if num_rows_seen < start_at_row:
+                    continue
                 self._load_product_from_row(row)
         if self.pickle_file != "":
             for row in self.parsed_dataset.table:
+                num_rows_seen = num_rows_seen + 1
+                if num_rows_seen < start_at_row:
+                    continue
                 self._load_product_from_row(row.fields)
+                if num_rows_seen % 1000 == 0:
+                    print(f"Processed up to row {num_rows_seen}...")
+        print(f"Finished processing up to row {num_rows_seen}")
     
     def _load_product_from_row(self, row):
         main_category = row.get('mainCategory')
@@ -343,6 +353,7 @@ class KnowledgeGraphLoader():
         
         title = row.get('title')
         if not title:
+            self.skipped_products = self.skipped_products + 1
             return
 
         attributes = row

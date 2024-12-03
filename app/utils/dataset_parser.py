@@ -127,7 +127,7 @@ class DatasetParser():
         try:
             with open(filename, 'rb') as f:
                 self.table = pickle.load(f)
-            print(f"Loaded parsed dataset from file: {filename}")
+            print(f"Loaded parsed dataset with {len(self.table)} rows from file: {filename}")
         except Exception as e:
             print(f"Error while loading from pickle file {filename}: {e}")
             raise e

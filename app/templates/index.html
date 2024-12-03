@@ -263,7 +263,12 @@
           },
           body: params.toString()
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`); // Handle non-200 responses
+        }
+        return response.json(); // Return the promise from response.json() so the next .then(...) can use it
+      })
       .then(data => {
           // Do something with the response data
           // load data into the website.
@@ -272,10 +277,6 @@
           recommendation_text = data["text"];
           products = data["products"];
           cypher_query = data["query"];
-
-          productsDiv = document.getElementById("products");
-          llmResponseDiv = document.getElementById("llm-response");
-          cypherDiv = document.getElementById("cypher-query");
 
           // add llm response and cypher
           llmResponseDiv.innerHTML = recommendation_text
@@ -327,7 +328,10 @@
             `;
           }).join('');
       })    
-      .catch(error => console.error("Error:", error));
+      .catch(error => {
+        console.error("Error:", error)
+        llmResponseDiv.innerHTML = "Sorry; there was an error while processing the response."
+      });
   }
   
   // Handle click on Settings link to open the modal

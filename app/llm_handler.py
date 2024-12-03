@@ -1,4 +1,5 @@
 from enum import Enum
+import logging
 
 from google.cloud import storage
 
@@ -75,15 +76,16 @@ class LLMHandler:
 
         try:
             model_response = self.model.generate_content(augmented_query)
-            print(f"Final query: {augmented_query[:5000]}\nModel response: {model_response}")
+            logging.info(f"Final query: {augmented_query[:5000]}\nModel response: {model_response}")
         except Exception as e:
-            print(f"Error generating content: {e}")
+            logging.info(f"Error generating content: {e}")
         finally:
             return LLMResponse(self.neo4j_driver, model_response, self.retrieved_neo4j_records, cypher_query)
 
     def _augment_from_graph(self, user_query):
         # default non-augmented query
         # we replace this with an augmented query in the next step
+        cypher_query = ''
         augmented_query = PROMPT_TEMPLATE_NO_AUGMENTATION.format(
             user_query=user_query
         )
@@ -96,6 +98,8 @@ class LLMHandler:
                 categories=self.categories,
                 user_query=user_query
                 )
+            logging.info(f"LLM Prompt to generate Cypher query: {prompt_for_cypher}")
+            print(prompt_for_cypher)
             generated_cypher = self.model.generate_content(prompt_for_cypher)
 
             # Extract just the Cypher query from between the ```cypher and ``` markers
@@ -116,12 +120,14 @@ class LLMHandler:
                 user_query=user_query,
                 response=condensed_graph_nodes
             )
+            logging.info(f"LLM Prompt to generate recommendations: {augmented_query}")
+            print(augmented_query)
 
             # trunctae content to the maxmimum allowed by the model if it's oversized
             if len(augmented_query) >= self.MAX_TOKEN_SIZE:
                 augmented_query = augmented_query[:self.MAX_TOKEN_SIZE]
         except Exception as e:
-            print(f"Could not retrieve related information from Neo4J: {e}")
+            logging.error(f"Could not retrieve related information from Neo4J: {e}")
             self.retrieved_neo4j_records = []
             
         return augmented_query, cypher_query

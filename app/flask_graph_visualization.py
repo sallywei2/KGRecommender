@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint,Flask, render_template, jsonify, request
 from utils.rag_constants import NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD
 from utils.neo4j_client import get_driver, exec_query
@@ -13,7 +14,7 @@ try:
     driver = get_driver()
     driver.verify_connectivity()
 except Exception as e:
-    print(f"Failed to connect to Neo4j: {str(e)}. Please check if the Neo4j server is on and that the connection credentials are correctly set in utils/rag_constants.py")
+    logging.error(f"Failed to connect to Neo4j: {str(e)}. Please check if the Neo4j server is on and that the connection credentials are correctly set in utils/rag_constants.py")
     driver = None
 
 def get_categories(driver=driver):
@@ -71,7 +72,7 @@ def get_categories(driver=driver):
             
         return main_cats, cats, main_cat_counts, cat_counts
     except Exception as e:
-        print(f"Error getting categories: {str(e)}")
+        logging.error(f"Error getting categories: {str(e)}")
         return [], [], {}, {}
 
 def get_filtered_graph_data(main_categories=None, categories=None):
@@ -116,7 +117,7 @@ def get_filtered_graph_data(main_categories=None, categories=None):
         result = exec_query(driver, query, params)[0]
         return result['nodes'], result['relationships']
     except Exception as e:
-        print(f"Error querying Neo4j: {str(e)}")
+        logging.error(f"Error querying Neo4j: {str(e)}")
         return [], []
 
 
@@ -147,7 +148,7 @@ def get_graph():
         )
         return jsonify({"nodes": nodes, "edges": relationships})
     except Exception as e:
-        print(f"Error in get_graph: {str(e)}")
+        logging.error(f"Error in get_graph: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @graph.route('/update-category-counts')
@@ -183,5 +184,5 @@ def update_category_counts():
         category_counts = {record['category']: record['count'] for record in results}
         return jsonify({'category_counts': category_counts})
     except Exception as e:
-        print(f"Error in update_category_counts: {str(e)}")
+        logging.error(f"Error in update_category_counts: {str(e)}")
         return jsonify({"error": str(e)}), 500
