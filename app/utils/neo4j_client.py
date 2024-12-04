@@ -245,9 +245,11 @@ class KnowledgeGraphLoader():
         self.classes = self._extract_classes(self.ontology_graph)
         self.properties = self._extract_properties(self.ontology_graph)
     
-    def load_knowledge_graph(self, reset=True, start_at_row=0):
+    def load_knowledge_graph(self, reset=True, start_at_row=0, end_at_row=-1):
         """
         reset: whether to reset the knowledge graph in Neo4J
+        start_at_row: the row to start loading from
+        end_at_row: the row to end loading at. A value of -1 means load everything.
         """
         # perform a fresh load
         if reset:           
@@ -265,7 +267,7 @@ class KnowledgeGraphLoader():
         #self._load_knowledge_graph_classes()
         #print(f"Loaded {len(self.class_nodes.nodes)} classes from {self.ontology}")
             
-        self._load_products(start_at_row=start_at_row)
+        self._load_products(start_at_row=start_at_row, end_at_row=end_at_row)
         if self.csv_file:
             print(f"Loaded products in {len(self.class_nodes.nodes)} classes from {self.csv_file}")
         elif self.pickle_file:
@@ -324,24 +326,35 @@ class KnowledgeGraphLoader():
                         rel = Relationship(main_node, prop, prop_node)
                         neo4j_graph.create(rel)
     
-    def _load_products(self, start_at_row):
+    def _load_products(self, start_at_row, end_at_row):
         num_rows_seen = 0
-        if self.csv_file != "":
-            csv_data = self.csv_data
-            for _, row in csv_data.iterrows():
-                num_rows_seen = num_rows_seen + 1
-                if num_rows_seen < start_at_row:
-                    continue
-                self._load_product_from_row(row)
         if self.pickle_file != "":
-            for row in self.parsed_dataset.table:
-                num_rows_seen = num_rows_seen + 1
-                if num_rows_seen < start_at_row:
-                    continue
-                self._load_product_from_row(row.fields)
-                if num_rows_seen % 1000 == 0:
-                    print(f"Processed up to row {num_rows_seen}...")
-        print(f"Finished processing up to row {num_rows_seen}")
+            if end_at_row >= len(self.parsed_dataset.table) or end_at_row == -1:
+                end_at_row = len(self.parsed_dataset.table)
+        try:
+            if self.csv_file != "":
+                csv_data = self.csv_data
+                for _, row in csv_data.iterrows():
+                    num_rows_seen = num_rows_seen + 1
+                    if num_rows_seen < start_at_row:
+                        continue
+                    if num_rows_seen >= end_at_row:
+                        break
+                    self._load_product_from_row(row)
+            if self.pickle_file != "":
+                for row in self.parsed_dataset.table:
+                    num_rows_seen = num_rows_seen + 1
+                    if num_rows_seen < start_at_row:
+                        continue
+                    self._load_product_from_row(row.fields)
+                    if num_rows_seen % 1000 == 0:
+                        print(f"Processed up to row {num_rows_seen}...")
+                    if num_rows_seen >= end_at_row:
+                        break
+        except Exception as e:
+            raise e
+        finally:
+            print(f"Finished processing up to row {num_rows_seen}")
     
     def _load_product_from_row(self, row):
         main_category = row.get('mainCategory')

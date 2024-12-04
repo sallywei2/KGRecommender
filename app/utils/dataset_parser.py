@@ -76,7 +76,7 @@ class DatasetParser():
                 if error:
                     print(f"i: {i}")
                     parsed_row.print()
-        print(f"loaded {len(self.table)}/{len(chunk)} rows into table")
+        print(f"loaded {len(chunk)} rows into table (total: {len(self.table)})")
 
     def print_seen_attributes(self):
         print("\nSeen attributes:")
