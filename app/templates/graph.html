@@ -106,29 +106,11 @@
             <h2>Filters</h2>
             <div class="filter-section">
                 <h3>Main Categories</h3>
-                <div class="checkbox-list">
-                    {% for category in main_categories %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" name="mainCategory" value="{{ category }}" id="main-{{ category }}">
-                        <label for="main-{{ category }}">
-                            {{ category }} ({{ main_cat_counts.get(category, 0) }})
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
+                <div class="checkbox-list" id="main-categories-container"></div>
             </div>
             <div class="filter-section">
                 <h3>Categories</h3>
-                <div class="checkbox-list">
-                    {% for category in categories %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" name="category" value="{{ category }}" id="cat-{{ category }}">
-                        <label for="cat-{{ category }}">
-                            {{ category }} ({{ cat_counts.get(category, 0) }})
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
+                <div class="checkbox-list" id="categories-container"></div>
             </div>
             <button id="apply-filters">Apply Filters</button>
         </div>
@@ -144,18 +126,104 @@
     <script type="text/javascript">
         let network = null;
 
-        function loadGraphAndUpdateCounts(main_categories, categories, main_cat_counts, cat_counts) {
+        function updateCounts(data) {
+            const mainCategories = data.main_categories;
+            const categories = data.categories;
+            const mainCategoryCounts = data.main_category_counts;
+            const categoryCounts = data.category_counts;
+
+            console.log("Main Categories:", mainCategories);
+            console.log("Categories:", categories);
+            console.log("Main Category Counts:", mainCategoryCounts);
+            console.log("Category Counts:", categoryCounts);
+
+            // Only proceed if we have data
+            if (Object.keys(data.category_counts).length > 0) {
+                console.log("data.category_counts.length > 0; entries:")
+                console.log(Object.entries(data.category_counts));
+                
+                // First, zero out all counts
+                document.querySelectorAll('[for^="cat-"]').forEach(label => {
+                    const category = label.getAttribute('for').replace('cat-', '');
+                    label.textContent = `${category} (-)`;
+                });
+                
+                // Update counts for categories that have data
+                Object.entries(data.category_counts).forEach(([category, count]) => {
+                    // Escape special characters in the category name
+                    const escapedCategory = CSS.escape(`cat-${category}`);
+                    const label = document.querySelector(`label[for="${escapedCategory}"]`);
+                    if (label) {
+                        label.textContent = `${category} (${count})`;
+                    }
+                });
+                
+                // After updating, hide categories with zero counts
+                document.querySelectorAll('[for^="cat-"]').forEach(label => {
+                    const count = parseInt(label.textContent.match(/\((\d+)\)/)[1]);
+                    const category = label.getAttribute('for').replace('cat-', '');
+                    const escapedCategory = CSS.escape(`cat-${category}`);
+                    const checkbox = document.getElementById(escapedCategory);
+                    
+                    if (checkbox){
+                        if (count === 0) {
+                            label.style.display = 'none';
+                            checkbox.style.display = 'none';
+                        } else {
+                            label.style.display = '';
+                            checkbox.style.display = '';
+                        }
+                    }
+                });
+            }
+        }
+
+        function loadCategoryCheckboxes(data){
+            const mainCategoriesContainer = document.getElementById('main-categories-container');
+            mainCategoriesContainer.innerHTML = ''; // Clear existing content
+            data.main_categories.forEach(category => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" name="mainCategory" value="${category}" id="main-${category}">
+                    <label for="main-${category}">${category} (${data.main_category_counts[category] || 0})</label>
+                `;
+                mainCategoriesContainer.appendChild(checkboxItem);
+            });
+
+            // Create category checkboxes (similar to above)
+            const categoriesContainer = document.getElementById('categories-container');
+            categoriesContainer.innerHTML = ''; // Clear existing content
+            data.categories.forEach(category => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" name="category" value="${category}" id="cat-${category}">
+                    <label for="cat-${category}">${category} (${data.category_counts[category] || 0})</label>
+                `;
+                categoriesContainer.appendChild(checkboxItem);
+            });
+        }
+
+        function loadGraphAndUpdateCounts() {
             // Get selected filters
-            const mainCategories = Array.from(document.querySelectorAll('input[name="mainCategory"]:checked'))
+            const selected_mainCategories = Array.from(document.querySelectorAll('input[name="mainCategory"]:checked'))
                 .map(cb => cb.value);
-            const categories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+            const selected_categories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
                 .map(cb => cb.value);
             
             // Build query string
             const params = new URLSearchParams();
-            mainCategories.forEach(cat => params.append('mainCategory', cat));
-            categories.forEach(cat => params.append('category', cat));
+            selected_mainCategories.forEach(cat => params.append('mainCategory', cat));
+            selected_categories.forEach(cat => params.append('category', cat));
+
+            // Update category counts
+            fetch('/graph/update-category-counts?' + params.toString())
+                .then(response => response.json())
+                .then(data => updateCounts(data))
+                .catch(error => console.error('Error updating counts:', error));
             
+
             // Update the graph
             fetch('/graph/graph-data?' + params.toString())
                 .then(response => response.json())
@@ -216,56 +284,18 @@
                         }
                     });
                 });
-            
-            // Then, update category counts
-            fetch('/graph/update-category-counts?' + params.toString())
-                .then(response => response.json())
-                .then(data => {
-                    // Only proceed if we have data
-                    if (Object.keys(data.category_counts).length > 0) {
-                        console.log(Object.entries(data.category_counts));
-                        
-                        // First, zero out all counts
-                        document.querySelectorAll('[for^="cat-"]').forEach(label => {
-                            const category = label.getAttribute('for').replace('cat-', '');
-                            label.textContent = `${category} (0)`;
-                        });
-                        
-                        // Update counts for categories that have data
-                        Object.entries(data.category_counts).forEach(([category, count]) => {
-                            // Escape special characters in the category name
-                            const escapedCategory = CSS.escape(`cat-${category}`);
-                            const label = document.querySelector(`label[for="${escapedCategory}"]`);
-                            if (label) {
-                                label.textContent = `${category} (${count})`;
-                            }
-                        });
-                        
-                        // After updating, hide categories with zero counts
-                        document.querySelectorAll('[for^="cat-"]').forEach(label => {
-                            const count = parseInt(label.textContent.match(/\((\d+)\)/)[1]);
-                            const category = label.getAttribute('for').replace('cat-', '');
-                            const escapedCategory = CSS.escape(`cat-${category}`);
-                            const checkbox = document.getElementById(escapedCategory);
-                            
-                            if (count === 0) {
-                                label.style.display = 'none';
-                                checkbox.style.display = 'none';
-                            } else {
-                                label.style.display = '';
-                                checkbox.style.display = '';
-                            }
-                        });
-                    }
-                });
         }
 
         // Initial load: only render graph when the user requests it, rather than upon app startup
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('/get_categories') // New AJAX request to fetch data
+            fetch('/graph/get_categories') // New AJAX request to fetch data
                 .then(response => response.json())
                 .then(data => {
-                    loadGraphAndUpdateCounts(data.main_categories, data.categories, data.main_cat_counts, data.cat_counts);
+                    // if this is the initial page load with prefetched_counts, then add the category checkboxes in the HTML
+                    const mainCategoriesContainer = document.getElementById('main-categories-container');
+                    const categoriesContainer = document.getElementById('categories-container');
+                    loadCategoryCheckboxes(data)
+                    updateCounts(data);
                 })
                 .catch(error => {
                     console.error('Error fetching categories:', error);
@@ -311,23 +341,7 @@
                 if (key === 'images') {
                     try {
                         // Convert the string to a valid JSON array
-                        let jsonString = value
-                            .replace(/'/g, '"')        // Replace single quotes with double quotes
-                            .replace(/None/g, 'null')  // Replace Python None with JavaScript null
-                            .replace(/\s+/g, ' ');     // Normalize whitespace
-                        
-                        // Split the string into individual objects and wrap in array
-                        const imageObjects = jsonString.split('}, {').map(str => {
-                            // Clean up the string and ensure proper JSON format
-                            return str
-                                .replace(/^{/, '')     // Remove leading {
-                                .replace(/}$/, '')     // Remove trailing }
-                                .trim();
-                        });
-                        
-                        // Reconstruct as a proper JSON array
-                        jsonString = '[{' + imageObjects.join('}, {') + '}]';
-                        
+                        let jsonString = value.replace("(","{[").replace(")","]}").replace("'",'"')
                         const imageDataArray = JSON.parse(jsonString);
                         
                         propertyDiv.innerHTML = `

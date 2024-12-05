@@ -130,10 +130,10 @@ def visualization():
 def get_categories_ajax():
     main_categories, categories, main_cat_counts, cat_counts = get_categories()
     return jsonify({
-        'main_categories': main_categories,
-        'categories': categories,
-        'main_cat_counts': main_cat_counts,
-        'cat_counts': cat_counts
+        'main_categories': main_categories or [],
+        'categories': categories or [],
+        'main_category_counts': main_cat_counts or [],
+        'category_counts': cat_counts or []
     })
 
 @graph.route('/graph-data')

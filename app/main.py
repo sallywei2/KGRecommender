@@ -51,4 +51,4 @@ def close_driver(error):
     llm_handler.neo4j_driver.close()
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
