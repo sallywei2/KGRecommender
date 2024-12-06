@@ -12,6 +12,7 @@ google-cloud >= 0.34.0
 google-cloud-bigquery
 google-cloud-storage
 google-cloud-aiplatform
+google-cloud-secret-manager
 gunicorn
 
 # preprocessing pipeline and GCP

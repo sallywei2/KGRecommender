@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from .gcp_secretmanager_client import get_secret
 
 class Mode(Enum):
     Graph: str = "graph"
@@ -28,7 +29,7 @@ TABLE_ID = "clean_giftcard"
 # Neo4j
 NEO4J_URI="neo4j+s://71e5cc7d.databases.neo4j.io"
 NEO4J_USERNAME="neo4j"
-NEO4J_PASSWORD="eVPXWxkCzICKvPqd69D_aSJRJEAS7CeXL5OLqBIxXVI"
+NEO4J_PASSWORD=get_secret(PROJECT_ID, "neo4j_password", 1)
 """
 
 ### Sally
@@ -43,17 +44,14 @@ BUCKET = 'ontologykg2'
 DATASET_ID = "JSON_DATASET"
 TABLE_ID = "clean_giftcard"
 
-# Dataflow API Service Account Key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "static/deft-return-439619-h9-151ce547a5fd.json"
-
 # Neo4j
-NEO4J_URI = "neo4j+s://508011ec.databases.neo4j.io"
+NEO4J_URI = "neo4j+s://618d6275.databases.neo4j.io"
 NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "WVdTBF4CkcyCgzVTrUoCQsXQCSLi0qBLjp_st-EClTw"
+NEO4J_PASSWORD = get_secret(PROJECT_ID, "neo4j_password", 6)
 
 #NEO4J_URI = "bolt://localhost:7687"
 #NEO4J_USERNAME = "neo4j"
-#NEO4J_PASSWORD = "password"
+#NEO4J_PASSWORD = get_secret(PROJECT_ID, "neo4j_password", 3)
 
 ### Mouni
 """
@@ -72,4 +70,4 @@ TABLE_ID = "clean_giftcard"
 """
 
 LLAMA_ENDPOINT = "https://api.llama-api.com"
-LLAMA_API_KEY = "LA-dcab54ee6be342e3a9d518387fb66db22c05e43c71c7403bb658cd06f89f0fbd"
+LLAMA_API_KEY = get_secret(PROJECT_ID, "llama_api_key", 1)

@@ -22,9 +22,9 @@ Generate authentication for gcloud
 
 	gcloud auth application-default login
 
-(Optional) To ensure `gcloud` is updated, run:
+Check which service account is being used
 
-	gcloud components update
+	gcloud auth list
 
 ### GCP Cloud Storage
 
@@ -52,16 +52,14 @@ Edit the following in utils/rag_constants.py to your own values:
 
 In GCP Console, search for DataFlow API (*not* Dataflow). Enable it.
 
+**Create a Service Account**
+
 Create a service account following the [guide on Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc)
 
 	Create a service account with the roles your application needs, and a key for that service account, by following the instructions in Creating a service account key.
 	Set the environment variable GOOGLE_APPLICATION_CREDENTIALS to the path of the JSON file that contains your credentials. This variable applies only to your current shell session, so if you open a new session, set the variable again.
 
 Get a key for the service account following this [guide to create and delete service account keys](https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-console). Create and save the key as a JSON file.
-
-Edit the following in utils/rag_constants.py to your own values:
-
-	os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:/Users/.../deft-return-439619-h9-151ce547a5fd.json"
 
 ### GCP Neo4j Aura Integration Service & Neo4J Aura
 
@@ -88,6 +86,11 @@ Enable Google App Engine.
 
 Create the app in the same region as your bucket and other resources.
 
+Initialize GCP docker to let Google App Engine deploy to it.
+In the GCP Console, navigate to Artifact Registry > Repositories > Setup instructions. Run the command listed, which should be something like:
+
+	gcloud auth configure-docker us-docker.pkg.dev
+
 Deploy the app to Google App Engine. Change to the directory with app.yaml in it.
 	cd KGRecommender/app
 	gcloud app deploy
@@ -95,6 +98,15 @@ Deploy the app to Google App Engine. Change to the directory with app.yaml in it
 After deployment, the web app at https://PROJECT_ID.REGION_ID.r.appspot.com e.g., https://deft-return-439619-h9.uw.r.appspot.com
 or run 
 	gcloud app browse
+
+Go to IAM and find the service account for the deployed google cloud app. Assign it the following roles:
+* Dataflow Admin
+* Storage Admin
+* Storage Object Admin
+* Secret Manager Secret Accessor
+* Secret Manager Viewer
+* Vertex AI User
+* Vertex AI Administrator
 
 ## Local Setup
 
